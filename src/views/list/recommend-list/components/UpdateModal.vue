@@ -1,0 +1,202 @@
+<template>
+  <a-modal
+    :visible="visible"
+    title="编辑至尊推介"
+    :width="700"
+    :afterClose="afterClose"
+    @ok="onOk"
+    @cancel="onCancel"
+  >
+    <a-form
+      :form="form"
+      :label-col="{ span: 4 }"
+      :wrapper-col="{ span: 20 }"
+      autocomplete="off"
+    >
+      <a-form-item label="赛事名称">
+        <a-input
+          v-decorator="[
+            'competition',
+            { initialValue: '', rules: rules.competition }
+          ]"
+          placeholder="请输入赛事名称"
+        ></a-input>
+      </a-form-item>
+      <a-form-item label="主队">
+        <a-input
+          v-decorator="[
+            'homeTeam',
+            { initialValue: '', rules: rules.homeTeam }
+          ]"
+          placeholder="请输入主队"
+        ></a-input>
+      </a-form-item>
+      <a-form-item label="客队">
+        <a-input
+          v-decorator="[
+            'visitingTeam',
+            { initialValue: '', rules: rules.visitingTeam }
+          ]"
+          placeholder="请输入客队"
+        ></a-input>
+      </a-form-item>
+      <a-form-item label="推荐">
+        <a-input
+          v-decorator="[
+            'proposal',
+            { initialValue: '', rules: rules.proposal }
+          ]"
+          placeholder="请输入推荐"
+        ></a-input>
+      </a-form-item>
+      <a-row>
+        <a-col :span="12">
+          <a-form-item
+            label="发布时间"
+            :label-col="{ span: 8 }"
+            :wrapper-col="{ span: 16 }"
+          >
+            <a-date-picker
+              v-decorator="[
+                'publicationTime',
+                { initialValue: '', rules: rules.publicationTime }
+              ]"
+              :showTime="showTime"
+              format="YYYY-MM-DD HH:mm"
+              valueFormat="YYYY-MM-DD HH:mm"
+            ></a-date-picker>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item
+            label="作者"
+            :label-col="{ span: 6 }"
+            :wrapper-col="{ span: 18 }"
+            v-show="hasAuth(userPermissionMap, $route.name, 'all')"
+          >
+            <a-select
+              v-decorator="[
+                'userId',
+                {
+                  initialValue: undefined,
+                  rules: hasAuth(userPermissionMap, $route.name, 'all')
+                    ? rules.userId
+                    : []
+                }
+              ]"
+              placeholder="请选择作者"
+            >
+              <a-select-option v-for="item in userList" :key="item.id">{{
+                item.realname
+              }}</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-form>
+  </a-modal>
+</template>
+
+<script>
+import { hasAuth } from '@/utils'
+
+const formFields = [
+  'userId',
+  'competition',
+  'homeTeam',
+  'visitingTeam',
+  'proposal',
+  'publicationTime'
+]
+
+export default {
+  name: 'UpdateModal',
+  props: {
+    visible: {
+      type: Boolean,
+      default: false
+    },
+    recommendDetail: {
+      type: Object,
+      default() {
+        return {}
+      }
+    },
+    userList: {
+      type: Array,
+      default() {
+        return []
+      }
+    },
+    userPermissionMap: {
+      type: Object,
+      default() {
+        return {}
+      }
+    }
+  },
+  data() {
+    return {
+      form: this.$form.createForm(this),
+      rules: {
+        competition: [{ required: true, message: '请输入赛事名称' }],
+        homeTeam: [{ required: true, message: '请输入主队' }],
+        visitingTeam: [{ required: true, message: '请输入客队' }],
+        proposal: [{ required: true, message: '请输入推荐' }],
+        publicationTime: [{ required: true, message: '请选择发布时间' }],
+        userId: [{ required: true, message: '请选择作者' }]
+      },
+      showTime: {
+        format: 'HH:mm'
+      }
+    }
+  },
+  watch: {
+    visible(val) {
+      if (val) {
+        this.$nextTick(() => {
+          const values = {}
+          for (let key in this.recommendDetail) {
+            if (formFields.includes(key)) {
+              values[key] = this.recommendDetail[key]
+            }
+          }
+          this.form.setFieldsValue(values)
+        })
+      }
+    }
+  },
+  methods: {
+    hasAuth,
+
+    onReset() {
+      this.form.resetFields()
+      this.$emit('update:recommendDetail', {})
+    },
+
+    // 完全关闭后
+    afterClose() {
+      this.onReset()
+      this.$emit('afterClose')
+    },
+
+    // 确定
+    onOk() {
+      this.form.validateFields((errors, values) => {
+        if (errors) return
+        this.$emit('submit', {
+          ...values,
+          id: this.recommendDetail.id
+        })
+      })
+    },
+
+    // 取消
+    onCancel() {
+      this.$emit('update:visible', false)
+    }
+  }
+}
+</script>
+
+<style lang="less" scoped></style>

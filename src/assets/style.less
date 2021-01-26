@@ -1,0 +1,147 @@
+*,
+:after,
+:before {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+body {
+  margin: 0;
+  // font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+.container {
+  padding: 24px;
+}
+
+.float-left {
+  float: left !important;
+}
+
+.float-right {
+  float: right !important;
+}
+
+.float-none {
+  float: none !important;
+}
+
+.clearfix::after {
+  display: block;
+  clear: both;
+  content: "";
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.m-0 {
+  margin: 0 !important;
+}
+
+.ant-btn + .ant-btn {
+  margin-left: 8px;
+}
+
+// .search-bar {
+//   .ant-form-item {
+//     display: flex;
+//     align-items: center;
+//     margin: 0;
+//   }
+
+//   .ant-form-item-label {
+//     flex: 0 0 90px;
+//   }
+
+//   .ant-form-item-control-wrapper {
+//     flex: 1 0 auto;
+//   }
+// }
+
+.color-blue {
+  color: #1890ff;
+}
+
+.color-orange {
+  color: #faad14;
+}
+
+.color-red {
+  color: #cb2323;
+}
+
+.color-green {
+  color: #269f16;
+}
+
+.color-golden {
+  color: #d9893d;
+}
+
+.color-blue {
+  color: #0096ff;
+}
+
+.color-gray {
+  color: #808080;
+}
+
+.color-deepGray {
+  color: #5a5a5a;
+}
+
+.text-break-all {
+  word-break: break-all !important;
+}
+
+.link.disabled {
+  cursor: default;
+}
+
+.search-bar-form {
+  .ant-form-item {
+    margin-bottom: 10px;
+  }
+}
+
+.small-tips-text {
+  font-size: 12px;
+  color: #f5222d;
+}
+
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+.bg-primary,
+.bg-primary:hover td {
+  background-color: #1890ff !important;
+  color: #fff !important;
+}
+
+.ck.ck-content {
+  min-height: 200px;
+}
