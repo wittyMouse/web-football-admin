@@ -85,8 +85,11 @@
                 }
               ]"
               placeholder="请选择作者"
+              show-search
+              :filter-option="false"
+              @search="onSelectSearch"
             >
-              <a-select-option v-for="item in userList" :key="item.id">{{
+              <a-select-option v-for="item in filterUserList" :key="item.id">{{
                 item.realname
               }}</a-select-option>
             </a-select>
@@ -99,6 +102,7 @@
 
 <script>
 import { hasAuth } from '@/utils'
+import debounce from 'lodash/debounce'
 
 export default {
   name: 'CreateModal',
@@ -121,6 +125,8 @@ export default {
     }
   },
   data() {
+    this.onSelectSearch = debounce(this.onSelectSearch, 500)
+
     return {
       form: this.$form.createForm(this),
       rules: {
@@ -133,7 +139,20 @@ export default {
       },
       showTime: {
         format: 'HH:mm'
+      },
+      keyword: ''
+    }
+  },
+  computed: {
+    filterUserList() {
+      if (this.keyword) {
+        const filterUserList = this.userList.filter(
+          item => item.realname.indexOf(this.keyword) > -1
+        )
+        // console.log('filterUserList', filterUserList)
+        return filterUserList
       }
+      return this.userList
     }
   },
   methods: {
@@ -145,8 +164,14 @@ export default {
 
     // 完全关闭后
     afterClose() {
+      this.keyword = ''
       this.onReset()
       this.$emit('afterClose')
+    },
+
+    // 下拉框搜索
+    onSelectSearch(value) {
+      this.keyword = value
     },
 
     // 确定
