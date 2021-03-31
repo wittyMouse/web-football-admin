@@ -91,9 +91,11 @@
         <template slot="options" slot-scope="text, record">
           <a @click="onUpdateClick(record)">修改会员信息</a>
           <a-divider type="vertical" />
-          <a @click="onRechargeClick('points', record)">积分充值</a>
+          <a @click="onTableClick('points', record)">积分充值</a>
           <a-divider type="vertical" />
-          <a @click="onRechargeClick('coin', record)">金币充值</a>
+          <a @click="onTableClick('coin', record)">金币充值</a>
+          <a-divider type="vertical" />
+          <a @click="onTableClick('free', record)">赠送推介</a>
         </template>
       </a-table>
 
@@ -139,6 +141,13 @@
       :target="target"
       :rechargeInfo.sync="rechargeInfo"
     />
+
+    <FreeRecommendModal
+      :visible.sync="freeRecommendModalVisible"
+      :memberDetail.sync="memberDetail"
+      :userList="userList"
+      @submit="onFreeRecommendSubmit"
+    />
   </div>
 </template>
 
@@ -153,6 +162,7 @@ import ExportModal from '@/components/ExportModal'
 import UpdateModal from './components/UpdateModal'
 import RechargeModal from './components/RechargeModal'
 import RechargeInfoModal from './components/RechargeInfoModal'
+import FreeRecommendModal from './components/FreeRecommendModal'
 
 export default {
   name: 'member-list',
@@ -160,7 +170,8 @@ export default {
     ExportModal,
     UpdateModal,
     RechargeModal,
-    RechargeInfoModal
+    RechargeInfoModal,
+    FreeRecommendModal
   },
   data() {
     return {
@@ -176,12 +187,16 @@ export default {
       updateModalVisible: false,
       rechargeModalVisible: false,
       rechargeInfoModalVisible: false,
+      freeRecommendModalVisible: false,
       memberDetail: {},
       channelListloading: false,
       channelList: [],
       resetPasswordLoading: false,
       target: '',
-      rechargeInfo: {}
+      rechargeInfo: {},
+      userListLoading: false,
+      userList: [],
+      freeReommendLoading: false
     }
   },
   computed: {
@@ -343,6 +358,44 @@ export default {
         })
     },
 
+    // 查询用户列表
+    getUserList() {
+      this.userListLoading = true
+      api
+        .getUserList({
+          pageNo: 1,
+          pageSize: 9999,
+          query: {}
+        })
+        .then(res => {
+          if (res.success) {
+            this.userList = res.result.records
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.userListLoading = false
+        })
+    },
+
+    // 赠送推介
+    freeReommend(params, cb) {
+      this.freeReommendLoading = true
+      api
+        .freeReommend(params)
+        .then(res => {
+          if (res.code === 0) {
+            cb && cb(res.result)
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.freeReommendLoading = false
+        })
+    },
+
     // 搜索按钮
     onSearchClick() {
       const { account, mobile } = this.form.getFieldsValue()
@@ -389,10 +442,18 @@ export default {
     },
 
     // 充值按钮
-    onRechargeClick(target, record) {
-      this.target = target
+    onTableClick(target, record) {
       this.memberDetail = record
-      this.rechargeModalVisible = true
+      switch (target) {
+        case 'points':
+        case 'coin':
+          this.target = target
+          this.rechargeModalVisible = true
+          break
+        case 'free':
+          this.freeRecommendModalVisible = true
+          break
+      }
     },
 
     // 点击重置密码
@@ -459,6 +520,19 @@ export default {
       }
     },
 
+    // 赠送推介提交
+    onFreeRecommendSubmit(values) {
+      // console.log('freeRecommend', values)
+      this.freeReommend(values, () => {
+        this.updateList()
+        this.freeRecommendModalVisible = false
+        this.$success({
+          title: '提示',
+          content: '赠送推介成功'
+        })
+      })
+    },
+
     // 格式化请求参数
     formatParams() {
       const {
@@ -494,6 +568,7 @@ export default {
   },
   mounted() {
     this.getChannelConfig()
+    this.getUserList()
     this.updateList()
   }
 }

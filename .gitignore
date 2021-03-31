@@ -2,7 +2,7 @@
 node_modules
 /dist
 /football-admin
-
+/test-football-admin
 
 # local env files
 .env.local

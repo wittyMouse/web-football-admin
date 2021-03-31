@@ -122,6 +122,9 @@ export const updateMemberStatus = params =>
 // 会员重置密码
 export const resetPassword = params =>
   postAction('/member/resetPassword', params)
+// 赠送推介
+export const freeReommend = params =>
+  postAction('/member/givingSubscribe', params)
 
 // 获取节目分类列表
 export const getRadioGroupList = params =>
@@ -135,6 +138,16 @@ export const addRadio = params => postAction('/record/addRecord', params)
 export const updateRadio = params => postAction('/record/updateRecord', params)
 // 删除节目
 export const deleteRadio = params => postAction('/record/deleteRecord', params)
+
+// 获取榜单分页列表
+export const getRankingList = params =>
+  postAction('/rankingList/findListByPage', params)
+// 添加榜单数据
+export const addRanking = params => postAction('/rankingList/add', params)
+// 更新榜单数据
+export const updateRanking = params => postAction('/rankingList/update', params)
+// 删除榜单数据
+export const deleteRanking = params => postAction('/rankingList/delete', params)
 
 // 账变记录
 export const getOrderRecord = params =>
@@ -321,6 +334,7 @@ export default {
   addArticle,
   updateArticle,
   deleteArticle,
+  batchDeleteArticle,
   topArticle,
   recommendArticle,
 
@@ -344,6 +358,7 @@ export default {
   integralRecharge,
   updateMemberStatus,
   resetPassword,
+  freeReommend,
 
   // 节目
   getRadioList,
@@ -351,6 +366,12 @@ export default {
   updateRadio,
   deleteRadio,
   getRadioGroupList,
+
+  // 榜单
+  getRankingList,
+  addRanking,
+  updateRanking,
+  deleteRanking,
 
   // 账变记录
   getOrderRecord,

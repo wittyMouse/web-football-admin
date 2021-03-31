@@ -59,6 +59,12 @@ const routes = [
         name: 'department-list',
         component: () => import('../views/list/department-list'),
         meta: { title: '部门列表', requiresAuth: true }
+      },
+      {
+        path: 'ranking-list',
+        name: 'ranking-list',
+        component: () => import('../views/list/ranking-list'),
+        meta: { title: '榜单数据列表', requiresAuth: true }
       }
     ]
   },
