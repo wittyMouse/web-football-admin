@@ -125,6 +125,9 @@ export const resetPassword = params =>
 // 赠送推介
 export const freeReommend = params =>
   postAction('/member/givingSubscribe', params)
+// 变更订阅为失效
+export const changeSubscribeStatus = params =>
+  postAction('/member/changeSubscribe', params)
 
 // 获取节目分类列表
 export const getRadioGroupList = params =>
@@ -359,6 +362,7 @@ export default {
   updateMemberStatus,
   resetPassword,
   freeReommend,
+  changeSubscribeStatus,
 
   // 节目
   getRadioList,

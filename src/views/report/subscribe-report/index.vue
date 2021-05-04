@@ -101,6 +101,13 @@
         :loading="loading"
         size="middle"
       >
+        <template slot="options" slot-scope="text, record">
+          <a
+            @click="onTableClick('settlement', record)"
+            v-if="record.status === 1"
+            >结算</a
+          >
+        </template>
       </a-table>
 
       <a-pagination
@@ -261,6 +268,24 @@ export default {
         })
     },
 
+    // 变更订阅为失效
+    changeSubscribeStatus(params, cb) {
+      this.refundLoading = true
+      api
+        .changeSubscribeStatus(params)
+        .then(res => {
+          if (res.code === 0) {
+            this.$_message.success('结算成功')
+            cb && cb()
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.refundLoading = false
+        })
+    },
+
     // 搜索按钮
     onSearchClick() {
       const { account, realname } = this.form.getFieldsValue()
@@ -342,6 +367,28 @@ export default {
     // 关闭返款提示框
     onTipsCancel() {
       this.tipsModalVisible = false
+    },
+
+    // 充值按钮
+    onTableClick(target, record) {
+      switch (target) {
+        case 'settlement':
+          this.$confirm({
+            title: '提示',
+            content: `是否结算订单号为【${record.id}】的订阅？`,
+            keyboard: false,
+            onOk: () => {
+              this.changeSubscribeStatus({ id: record.id }, () => {
+                this.$success({
+                  title: '成功',
+                  content: `结算成功`
+                })
+                this.updateList()
+              })
+            }
+          })
+          break
+      }
     },
 
     // 格式化请求参数

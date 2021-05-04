@@ -62,5 +62,12 @@ export default [
     title: '成绩',
     dataIndex: 'score',
     align: 'center'
+  },
+  {
+    title: '操作',
+    key: 'options',
+    width: 60,
+    align: 'center',
+    scopedSlots: { customRender: 'options' }
   }
 ]
