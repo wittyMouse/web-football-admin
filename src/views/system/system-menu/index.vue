@@ -333,6 +333,7 @@ export default {
               if (res.success) {
                 const allAuth = res.result.allAuth
                 if (
+                  !this.isEdit &&
                   allAuth.findIndex(item => item.action === params.perms) > -1
                 ) {
                   this.$_message.error('权限编码已存在')
