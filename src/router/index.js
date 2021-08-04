@@ -204,10 +204,6 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  // 滚动行为
-  scrollBehavior() {
-    return { x: 0, y: 0 }
-  },
   routes
 })
 
