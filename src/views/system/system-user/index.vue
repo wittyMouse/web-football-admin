@@ -64,6 +64,11 @@
                 <a @click="onEditClick(record)">修改订阅金币</a>
               </a-menu-item>
               <a-menu-item>
+                <a @click="onSaleClick(record)"
+                  >{{ { 0: '限时', 1: '取消' }[record.sale] }}特价</a
+                >
+              </a-menu-item>
+              <a-menu-item>
                 <a @click="handlePassClick(record)">修改密码</a>
               </a-menu-item>
               <a-menu-item>
@@ -290,7 +295,8 @@ export default {
         'X-Access-Token': window.sessionStorage.getItem('token')
       },
       uploading: false,
-      imageUrl: ''
+      imageUrl: '',
+      onSaleLoading: false
     }
   },
   computed: {
@@ -578,6 +584,24 @@ export default {
         })
     },
 
+    // 修改用户限时促销状态
+    updateOnSaleStatus(params, cb) {
+      this.onSaleLoading = true
+      api
+        .updateOnSaleStatus(params)
+        .then(res => {
+          if (res.code === 200) {
+            this.$_message.success(res.message)
+            cb && cb()
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.onSaleLoading = false
+        })
+    },
+
     // 修改订阅金币
     onEditClick(record) {
       this.userDetail = record
@@ -676,6 +700,26 @@ export default {
           this.visible = true
         } else {
           this.$_message.error(res[1].message)
+        }
+      })
+    },
+
+    //
+    onSaleClick(record) {
+      this.$confirm({
+        title: '提示',
+        content: `确定要${{ 0: '开启', 1: '取消' }[record.sale]}用户【${
+          record.realname
+        }】限时特价吗？`,
+        keyboard: false,
+        onOk: () => {
+          const params = {
+            id: record.id,
+            sale: record.sale ? 0 : 1
+          }
+          this.updateOnSaleStatus(params, () => {
+            this.updateList()
+          })
         }
       })
     },

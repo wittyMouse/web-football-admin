@@ -25,6 +25,13 @@ export default [
     align: 'center'
   },
   {
+    title: '限时特价',
+    dataIndex: 'sale',
+    width: 100,
+    align: 'center',
+    customRender: text => ({ 0: '否', 1: '是' }[text])
+  },
+  {
     title: '状态',
     dataIndex: 'status',
     width: 140,
