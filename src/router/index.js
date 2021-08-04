@@ -188,6 +188,12 @@ const routes = [
         name: 'system-channel',
         component: () => import('../views/system/system-channel'),
         meta: { title: '渠道配置', requiresAuth: true }
+      },
+      {
+        path: 'system-level',
+        name: 'system-level',
+        component: () => import('../views/system/system-level'),
+        meta: { title: '等级配置', requiresAuth: true }
       }
     ]
   },
