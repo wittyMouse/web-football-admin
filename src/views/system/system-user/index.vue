@@ -65,7 +65,7 @@
               </a-menu-item>
               <a-menu-item>
                 <a @click="onSaleClick(record)"
-                  >{{ { 0: '限时', 1: '取消' }[record.sale] }}特价</a
+                  >{{ { 0: '开启', 1: '关闭' }[record.sale] }}限时特价</a
                 >
               </a-menu-item>
               <a-menu-item>
@@ -708,7 +708,7 @@ export default {
     onSaleClick(record) {
       this.$confirm({
         title: '提示',
-        content: `确定要${{ 0: '开启', 1: '取消' }[record.sale]}用户【${
+        content: `确定要${{ 0: '开启', 1: '关闭' }[record.sale]}用户【${
           record.realname
         }】限时特价吗？`,
         keyboard: false,
