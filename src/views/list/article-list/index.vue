@@ -66,7 +66,70 @@
         <a-button type="primary" icon="plus" @click="onAddClick"
           >写文章</a-button
         >
+        <!-- <a-button
+          v-show="selectSize > 0"
+          type="danger"
+          icon="delete"
+          :loading="batchDeleteLoading"
+          @click="handleMultipleDeleteClick"
+          >批量删除</a-button
+        > -->
       </template>
+
+      <!-- <a-alert class="article-list-alert" type="info">
+        <template #message>
+          <span
+            >已选择 <a class="link disabled">{{ selectSize }}</a> 项</span
+          >
+          <a @click="handleSelectClean">清空</a>
+        </template>
+      </a-alert> -->
+
+      <!-- <a-table
+        rowKey="id"
+        :columns="columns"
+        :dataSource="dataSource"
+        :pagination="false"
+        :rowSelection="{
+          selectedRowKeys: selectedRowKeys,
+          onChange: onSelectChange
+        }"
+        :loading="loading"
+        size="middle"
+      >
+        <template slot="options" slot-scope="text, record">
+          <a @click="onEditClick(record)">编辑</a>
+          <a-divider type="vertical" />
+          <a @click="onDeleteClick(record)">删除</a>
+          <template
+            v-if="
+              hasAuth(userPermissionMap, $route.name, 'top') ||
+                hasAuth(userPermissionMap, $route.name, 'recommend')
+            "
+          >
+            <a-divider type="vertical" />
+            <a-dropdown>
+              <a>更多 <a-icon type="down"/></a>
+              <a-menu slot="overlay">
+                <a-menu-item
+                  v-show="hasAuth(userPermissionMap, $route.name, 'top')"
+                >
+                  <a @click="onTopClick(record)">{{
+                    record.isTop ? '取消置顶' : '置顶'
+                  }}</a>
+                </a-menu-item>
+                <a-menu-item
+                  v-show="hasAuth(userPermissionMap, $route.name, 'recommend')"
+                >
+                  <a @click="onRecommendClick(record)">{{
+                    record.isRecommend ? '取消推荐' : '推荐'
+                  }}</a>
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
+          </template>
+        </template>
+      </a-table> -->
 
       <a-table
         rowKey="id"
@@ -162,12 +225,15 @@ export default {
       addLoading: false,
       updateLoading: false,
       deleteLoading: false,
+      batchDeleteLoading: false,
       topLoading: false,
       recommendLoading: false,
       columnListLoading: false,
       form: this.$form.createForm(this),
       columns,
       dataSource: [],
+      // 选中项
+      selectedRowKeys: [],
       createModalVisible: false,
       updateModalVisible: false,
       articleDetail: {},
@@ -177,10 +243,23 @@ export default {
     }
   },
   computed: {
-    ...mapState(['userInfo', 'userPermissionMap'])
+    ...mapState(['userInfo', 'userPermissionMap']),
+    selectSize() {
+      return this.selectedRowKeys.length
+    }
   },
   mixins: [mixin, dateRange],
   methods: {
+    // 选中项发生变化时的回调
+    onSelectChange(selectedRowKeys) {
+      this.selectedRowKeys = selectedRowKeys
+    },
+
+    // 清空选中项
+    handleSelectClean() {
+      this.selectedRowKeys = []
+    },
+
     // 页码改变的回调，参数是改变后的页码及每页条数
     handlePaginationChange(page, pageSize) {
       this.pagination.current = page
@@ -314,6 +393,24 @@ export default {
         })
     },
 
+    // 批量删除文章
+    batchDeleteArticle(params, cb) {
+      this.batchDeleteLoading = true
+      api
+        .batchDeleteArticle(params)
+        .then(res => {
+          if (res.code === 0) {
+            this.$_message.success(res.message)
+            cb && cb()
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.batchDeleteLoading = false
+        })
+    },
+
     // 更新文章置顶信息
     topArticle(params, cb) {
       this.topLoading = true
@@ -379,6 +476,26 @@ export default {
     onAddClick() {
       this.getUserList()
       this.createModalVisible = true
+    },
+
+    // 批量删除
+    handleMultipleDeleteClick() {
+      this.$confirm({
+        title: '提示',
+        content: `确定要删除选中文章吗？`,
+        keyboard: false,
+        onOk: () => {
+          const params = {
+            ids: this.selectedRowKeys.join(',')
+          }
+          this.batchDeleteArticle(params, () => {
+            this.selectedRowKeys = []
+            this.pagination.current = 1
+            this.pagination.pageSize = 10
+            this.updateList()
+          })
+        }
+      })
     },
 
     // 编辑按钮
@@ -497,6 +614,16 @@ export default {
   .ant-pagination {
     float: right;
     margin: 16px 0;
+  }
+}
+
+.article-list-alert {
+  margin: 0 24px 16px;
+
+  .ant-alert-message {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 }
 </style>
