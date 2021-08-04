@@ -26,6 +26,13 @@
       </a-row>
 
       <a-row class="recharge-info-modal-item">
+        <a-col class="recharge-info-modal-label" :span="8">会员昵称：</a-col>
+        <a-col class="recharge-info-modal-value" :span="16">{{
+          rechargeInfo.nickname
+        }}</a-col>
+      </a-row>
+
+      <a-row class="recharge-info-modal-item">
         <a-col class="recharge-info-modal-label" :span="8"
           >充值前{{ target ? rechargeTarget[target] : '' }}：</a-col
         >

@@ -13,6 +13,15 @@
       :wrapper-col="{ span: 20 }"
       autocomplete="off"
     >
+      <a-form-item label="会员编号">
+        {{ memberDetail.memberId }}
+      </a-form-item>
+      <a-form-item label="会员账户">
+        {{ memberDetail.account }}
+      </a-form-item>
+      <a-form-item label="会员昵称">
+        {{ memberDetail.nickname }}
+      </a-form-item>
       <a-form-item label="作者">
         <a-select
           v-decorator="['userId', { initialValue: '', rules: rules.userId }]"

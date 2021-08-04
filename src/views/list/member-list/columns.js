@@ -15,41 +15,62 @@ export default [
   {
     title: '会员编号',
     dataIndex: 'memberId',
-    width: 160,
+    width: 180,
     align: 'center'
   },
   {
     title: '会员账户',
     dataIndex: 'account',
+    width: 280,
+    align: 'center'
+  },
+  {
+    title: '会员昵称',
+    dataIndex: 'nickname',
+    width: 240,
     align: 'center'
   },
   {
     title: '手机号码',
     dataIndex: 'mobile',
-    width: 140,
+    width: 120,
     align: 'center',
     scopedSlots: { customRender: 'mobile' }
   },
   {
     title: '注册时间',
     dataIndex: 'registerTime',
-    width: 150,
+    width: 170,
     align: 'center'
   },
   {
     title: '最后登录时间',
     dataIndex: 'lastLoginTime',
-    width: 150,
+    width: 170,
     align: 'center'
   },
   {
     title: '金币余额',
     dataIndex: 'balance',
+    width: 120,
     align: 'center'
   },
   {
     title: '积分',
     dataIndex: 'integral',
+    width: 120,
+    align: 'center'
+  },
+  {
+    title: '等级',
+    dataIndex: 'vipLevel',
+    width: 80,
+    align: 'center'
+  },
+  {
+    title: '经验值',
+    dataIndex: 'exp',
+    width: 120,
     align: 'center'
   },
   /**
@@ -65,11 +86,13 @@ export default [
   {
     title: '渠道',
     dataIndex: 'channelName',
+    width: 200,
     align: 'center'
   },
   {
     title: '操作',
     key: 'options',
+    fixed: 'right',
     width: 250,
     align: 'center',
     scopedSlots: { customRender: 'options' }

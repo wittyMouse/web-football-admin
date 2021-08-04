@@ -19,6 +19,9 @@
       <a-form-item label="会员账户">
         {{ memberDetail.account }}
       </a-form-item>
+      <a-form-item label="会员昵称">
+        {{ memberDetail.nickname }}
+      </a-form-item>
       <a-form-item label="充值积分" v-show="target === 'points'">
         <a-input
           v-decorator="[

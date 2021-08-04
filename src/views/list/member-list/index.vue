@@ -15,6 +15,12 @@
                 placeholder="请输入会员账户"
               ></a-input>
             </a-form-item>
+            <a-form-item label="会员昵称">
+              <a-input
+                v-decorator="['nickname', { initialValue: '' }]"
+                placeholder="请输入会员昵称"
+              ></a-input>
+            </a-form-item>
             <a-form-item label="会员状态">
               <a-select
                 :style="{ width: '174px' }"
@@ -78,6 +84,7 @@
         rowKey="id"
         :columns="columns"
         :dataSource="dataSource"
+        :scroll="{ x: 1810 }"
         :pagination="false"
         :loading="loading"
         size="middle"
@@ -94,6 +101,8 @@
           <a @click="onTableClick('points', record)">积分充值</a>
           <a-divider type="vertical" />
           <a @click="onTableClick('coin', record)">金币充值</a>
+          <a-divider type="vertical" />
+          <a @click="onTableClick('experience', record)">经验值修改</a>
           <a-divider type="vertical" />
           <a @click="onTableClick('free', record)">赠送推介</a>
         </template>
@@ -148,6 +157,13 @@
       :userList="userList"
       @submit="onFreeRecommendSubmit"
     />
+
+    <ExperienceModal
+      :visible.sync="experienceModalVisible"
+      :member-detail.sync="memberDetail"
+      :level-list.sync="levelList"
+      @submit="onExperienceSubmit"
+    />
   </div>
 </template>
 
@@ -163,6 +179,7 @@ import UpdateModal from './components/UpdateModal'
 import RechargeModal from './components/RechargeModal'
 import RechargeInfoModal from './components/RechargeInfoModal'
 import FreeRecommendModal from './components/FreeRecommendModal'
+import ExperienceModal from './components/ExperienceModal'
 
 export default {
   name: 'member-list',
@@ -171,7 +188,8 @@ export default {
     UpdateModal,
     RechargeModal,
     RechargeInfoModal,
-    FreeRecommendModal
+    FreeRecommendModal,
+    ExperienceModal
   },
   data() {
     return {
@@ -188,6 +206,7 @@ export default {
       rechargeModalVisible: false,
       rechargeInfoModalVisible: false,
       freeRecommendModalVisible: false,
+      experienceModalVisible: false,
       memberDetail: {},
       channelListloading: false,
       channelList: [],
@@ -196,7 +215,9 @@ export default {
       rechargeInfo: {},
       userListLoading: false,
       userList: [],
-      freeReommendLoading: false
+      freeReommendLoading: false,
+      changeExperienceLoading: false,
+      levelList: []
     }
   },
   computed: {
@@ -396,11 +417,42 @@ export default {
         })
     },
 
+    // 获取等级配置
+    getLevelConfig() {
+      const data = {
+        pageNo: 1,
+        pageSize: 9999
+      }
+      api.getLevelConfig(data).then(res => {
+        if (res.code === 0) {
+          this.levelList = res.result.records
+        }
+      })
+    },
+
+    // 经验值修改
+    changeExperience(params, cb) {
+      this.changeExperienceLoading = true
+      api
+        .changeExperience(params)
+        .then(res => {
+          if (res.code === 0) {
+            cb && cb(res.result)
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.changeExperienceLoading = false
+        })
+    },
+
     // 搜索按钮
     onSearchClick() {
-      const { account, mobile } = this.form.getFieldsValue()
+      const { account, nickname, mobile } = this.form.getFieldsValue()
       this.form.setFieldsValue({
         account: account.trim(),
+        nickname: nickname.trim(),
         mobile: mobile.trim()
       })
 
@@ -447,11 +499,18 @@ export default {
       switch (target) {
         case 'points':
         case 'coin':
+          // 积分/金币充值
           this.target = target
           this.rechargeModalVisible = true
           break
         case 'free':
+          // 赠送推介
           this.freeRecommendModalVisible = true
+          break
+        case 'experience':
+          // 经验值修改
+          this.getLevelConfig()
+          this.experienceModalVisible = true
           break
       }
     },
@@ -484,10 +543,17 @@ export default {
     // 提交充值表单
     onRechargeSubmit(values) {
       console.log('recharge', values)
-      const { memberId, account, balance, integral } = this.memberDetail
+      const {
+        memberId,
+        account,
+        nickname,
+        balance,
+        integral
+      } = this.memberDetail
       const rechargeInfo = {
         memberId,
-        account
+        account,
+        nickname
       }
       switch (this.target) {
         case 'points':
@@ -533,10 +599,23 @@ export default {
       })
     },
 
+    // 经验值修改提交
+    onExperienceSubmit(values) {
+      this.changeExperience(values, () => {
+        this.updateList()
+        this.experienceModalVisible = false
+        this.$success({
+          title: '提示',
+          content: '经验值修改成功'
+        })
+      })
+    },
+
     // 格式化请求参数
     formatParams() {
       const {
         account,
+        nickname,
         status,
         rangeDate,
         mobile,
@@ -548,6 +627,7 @@ export default {
 
       const params = {
         account,
+        nickname,
         status,
         mobile,
         channelId,
