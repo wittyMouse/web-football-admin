@@ -39,6 +39,9 @@ export const updateGALoginStatus = params =>
 // 更新用户订阅金币
 export const updateSubscribeCoin = params =>
   postAction('/sys/user/editAmont', params)
+// 修改用户限时促销状态
+export const updateOnSaleStatus = params =>
+  postAction('/sys/user/editSale', params)
 
 // 角色管理
 export const getRoleList = params => postAction('/sys/role/list', params)
@@ -74,6 +77,9 @@ export const addArticle = params => postAction('/article/add', params)
 export const updateArticle = params => postAction('/article/update', params)
 // 删除文章
 export const deleteArticle = params => postAction('/article/delete', params)
+// 批量删除文章
+export const batchDeleteArticle = params =>
+  postAction('/article/batchDelete', params)
 // 更新文章置顶信息
 export const topArticle = params => postAction('/article/updateIsTop', params)
 // 更新文章推荐信息
@@ -128,6 +134,9 @@ export const freeReommend = params =>
 // 变更订阅为失效
 export const changeSubscribeStatus = params =>
   postAction('/member/changeSubscribe', params)
+// 经验值修改
+export const changeExperience = params =>
+  postAction('/member/changeExp', params)
 
 // 获取节目分类列表
 export const getRadioGroupList = params =>
@@ -293,6 +302,22 @@ export const updateChannelConfig = params =>
 export const deleteChannelConfig = params =>
   postAction('/channel/delete', params)
 
+// 获取等级配置
+export const getLevelConfig = params =>
+  postAction('/vipLevelConfig/findListByPage', params)
+
+// 添加等级配置
+export const addLevelConfig = params =>
+  postAction('/vipLevelConfig/add', params)
+
+// 更新等级配置
+export const updateLevelConfig = params =>
+  postAction('/vipLevelConfig/update', params)
+
+// 删除等级配置
+export const deleteLevelConfig = params =>
+  postAction('/vipLevelConfig/delete', params)
+
 export default {
   getCheckCode,
   login,
@@ -313,6 +338,7 @@ export default {
   resetGACode,
   updateGALoginStatus,
   updateSubscribeCoin,
+  updateOnSaleStatus,
 
   // 角色管理
   addRole,
@@ -363,6 +389,7 @@ export default {
   resetPassword,
   freeReommend,
   changeSubscribeStatus,
+  changeExperience,
 
   // 节目
   getRadioList,
@@ -433,5 +460,11 @@ export default {
   getChannelConfig,
   addChannelConfig,
   updateChannelConfig,
-  deleteChannelConfig
+  deleteChannelConfig,
+
+  // 等级配置
+  getLevelConfig,
+  addLevelConfig,
+  updateLevelConfig,
+  deleteLevelConfig
 }
