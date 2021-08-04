@@ -18,6 +18,11 @@ export default [
     align: 'center'
   },
   {
+    title: '会员昵称',
+    dataIndex: 'nickname',
+    align: 'center'
+  },
+  {
     title: '充值金额',
     dataIndex: 'amount',
     align: 'center'

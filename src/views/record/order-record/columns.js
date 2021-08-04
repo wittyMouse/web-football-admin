@@ -19,6 +19,11 @@ export default [
     align: 'center'
   },
   {
+    title: '会员昵称',
+    dataIndex: 'nickname',
+    align: 'center'
+  },
+  {
     title: '变更前余额',
     dataIndex: 'beforeAmount',
     align: 'center'

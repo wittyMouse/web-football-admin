@@ -23,6 +23,12 @@
                 placeholder="请输入会员账号"
               ></a-input>
             </a-form-item>
+            <a-form-item label="会员昵称">
+              <a-input
+                v-decorator="['nickname', { initialValue: '' }]"
+                placeholder="请输入会员昵称"
+              ></a-input>
+            </a-form-item>
             <a-form-item
               label="作者"
               v-show="hasAuth(userPermissionMap, $route.name, 'all')"
@@ -93,6 +99,7 @@
         rowKey="id"
         :columns="columns"
         :dataSource="dataSource"
+        :scroll="{ x: 1820 }"
         :pagination="false"
         :rowSelection="{
           selectedRowKeys: selectedRowKeys,
@@ -288,9 +295,10 @@ export default {
 
     // 搜索按钮
     onSearchClick() {
-      const { account, realname } = this.form.getFieldsValue()
+      const { account, nickname, realname } = this.form.getFieldsValue()
       this.form.setFieldsValue({
         account: account.trim(),
+        nickname: nickname.trim(),
         realname: realname.trim()
       })
 
@@ -396,6 +404,7 @@ export default {
       const {
         rangeDate,
         account,
+        nickname,
         realname,
         type,
         status
@@ -406,6 +415,7 @@ export default {
 
       const params = {
         account,
+        nickname,
         realname,
         type,
         status,

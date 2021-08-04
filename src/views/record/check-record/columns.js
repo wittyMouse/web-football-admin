@@ -17,6 +17,11 @@ export default [
     align: 'center'
   },
   {
+    title: '会员昵称',
+    dataIndex: 'nickname',
+    align: 'center'
+  },
+  {
     title: '签到日期',
     dataIndex: 'signInDay',
     align: 'center'

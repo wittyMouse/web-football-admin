@@ -23,6 +23,12 @@
                 placeholder="请输入会员账号"
               ></a-input>
             </a-form-item>
+            <a-form-item label="会员昵称">
+              <a-input
+                v-decorator="['nickname', { initialValue: '' }]"
+                placeholder="请输入会员昵称"
+              ></a-input>
+            </a-form-item>
             <a-form-item
               label="作者"
               v-show="hasAuth(userPermissionMap, $route.name, 'all')"
@@ -76,6 +82,7 @@
         rowKey="buyRecordId"
         :columns="columns"
         :dataSource="dataSource"
+        :scroll="{ x: 1870 }"
         :pagination="false"
         :rowSelection="{
           selectedRowKeys: selectedRowKeys,
@@ -236,9 +243,15 @@ export default {
 
     // 搜索按钮
     onSearchClick() {
-      const { account, realname, articleTitle } = this.form.getFieldsValue()
+      const {
+        account,
+        nickname,
+        realname,
+        articleTitle
+      } = this.form.getFieldsValue()
       this.form.setFieldsValue({
         account: account.trim(),
+        nickname: nickname.trim(),
         realname: realname.trim(),
         articleTitle: articleTitle.trim()
       })
@@ -309,6 +322,7 @@ export default {
     formatParams() {
       const {
         account,
+        nickname,
         realname,
         articleTitle,
         rangeDate
@@ -319,6 +333,7 @@ export default {
 
       const params = {
         account,
+        nickname,
         realname,
         articleTitle,
         buyTimeBegin,

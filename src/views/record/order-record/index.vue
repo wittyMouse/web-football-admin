@@ -15,6 +15,12 @@
                 placeholder="请输入会员账号"
               ></a-input>
             </a-form-item>
+            <a-form-item label="会员昵称">
+              <a-input
+                v-decorator="['nickname', { initialValue: '' }]"
+                placeholder="请输入会员昵称"
+              ></a-input>
+            </a-form-item>
             <a-form-item label="变更类型">
               <a-select
                 :style="{ width: '174px' }"
@@ -121,9 +127,10 @@ export default {
 
     // 搜索按钮
     onSearchClick() {
-      const { account } = this.form.getFieldsValue()
+      const { account, nickname } = this.form.getFieldsValue()
       this.form.setFieldsValue({
-        account: account.trim()
+        account: account.trim(),
+        nickname: nickname.trim()
       })
 
       this.pagination.current = 1

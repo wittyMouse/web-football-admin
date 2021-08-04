@@ -15,6 +15,12 @@
                 placeholder="请输入会员账户"
               ></a-input>
             </a-form-item>
+            <a-form-item label="会员昵称">
+              <a-input
+                v-decorator="['nickname', { initialValue: '' }]"
+                placeholder="请输入会员昵称"
+              ></a-input>
+            </a-form-item>
             <a-form-item label="签到时间">
               <a-range-picker
                 v-decorator="['rangeDate', { initialValue: [] }]"
@@ -117,9 +123,10 @@ export default {
 
     // 搜索按钮
     onSearchClick() {
-      const { account } = this.form.getFieldsValue()
+      const { account, nickname } = this.form.getFieldsValue()
       this.form.setFieldsValue({
-        account: account.trim()
+        account: account.trim(),
+        nickname: nickname.trim()
       })
 
       this.pagination.current = 1
@@ -137,13 +144,14 @@ export default {
 
     // 格式化请求参数
     formatParams() {
-      const { account, rangeDate } = this.form.getFieldsValue()
+      const { account, nickname, rangeDate } = this.form.getFieldsValue()
 
       const [signInTimeBegin, signInTimeEnd] =
         rangeDate.length > 0 ? rangeDate : ['', '']
 
       const params = {
         account,
+        nickname,
         signInTimeBegin,
         signInTimeEnd,
         pageNo: this.pagination.current,

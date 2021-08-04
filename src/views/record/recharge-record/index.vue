@@ -23,6 +23,12 @@
                 placeholder="请输入会员账户"
               ></a-input>
             </a-form-item>
+            <a-form-item label="会员昵称">
+              <a-input
+                v-decorator="['nickname', { initialValue: '' }]"
+                placeholder="请输入会员昵称"
+              ></a-input>
+            </a-form-item>
             <a-form-item label="充值方式">
               <a-select
                 :style="{ width: '174px' }"
@@ -176,9 +182,10 @@ export default {
 
     // 搜索按钮
     onSearchClick() {
-      const { account } = this.form.getFieldsValue()
+      const { account, nickname } = this.form.getFieldsValue()
       this.form.setFieldsValue({
-        account: account.trim()
+        account: account.trim(),
+        nickname: nickname.trim()
       })
 
       this.pagination.current = 1
@@ -214,13 +221,14 @@ export default {
 
     // 格式化请求参数
     formatParams() {
-      const { account, rangeDate, type } = this.form.getFieldsValue()
+      const { account, nickname, rangeDate, type } = this.form.getFieldsValue()
 
       const [rechargeTimeBegin, rechargeTimeEnd] =
         rangeDate.length > 0 ? rangeDate : ['', '']
 
       const params = {
         account,
+        nickname,
         type,
         rechargeTimeBegin,
         rechargeTimeEnd,
