@@ -1,9 +1,17 @@
 <template>
-  <textarea></textarea>
+  <div>
+    <textarea ref="textareaRef"></textarea>
+
+    <RecommendPickerModal
+      :visible.sync="recommendPickerModalVisible"
+      @submit="onRecommendPickerSubmit"
+    />
+  </div>
 </template>
 
 <script>
 import ClassicEditor from '@/utils/ckeditor'
+import RecommendPickerModal from './RecommendPickerModal'
 import debounce from 'lodash/debounce'
 import UploadAdapter from './UploadAdapter'
 
@@ -46,6 +54,8 @@ const editorConfig = {
       'insertTable',
       'mediaEmbed',
       '|',
+      'customButton',
+      '|',
       'undo',
       'redo'
     ]
@@ -53,9 +63,13 @@ const editorConfig = {
   image: {
     toolbar: [
       'imageTextAlternative',
-      'imageStyle:full',
+      '|',
+      'imageStyle:inline',
+      'imageStyle:block',
       'imageStyle:side',
+      '|',
       'linkImage',
+      '|',
       'imageResize'
     ]
   },
@@ -72,6 +86,9 @@ const editorConfig = {
 
 export default {
   name: 'Editor',
+  components: {
+    RecommendPickerModal
+  },
   model: {
     prop: 'value',
     event: 'change'
@@ -84,11 +101,13 @@ export default {
   },
   data() {
     return {
+      editorConfig,
       $_instance: null,
       $_lastEditorData: {
         type: String,
         default: ''
-      }
+      },
+      recommendPickerModalVisible: false
     }
   },
   watch: {
@@ -121,14 +140,26 @@ export default {
       editor.editing.view.document.on('blur', evt => {
         this.$emit('blur', evt, editor)
       })
+    },
+
+    // 提交选中推介表单
+    onRecommendPickerSubmit(values) {
+      this.$_instance.execute('insertCustomButton', values.id)
+      this.recommendPickerModalVisible = false
     }
   },
   mounted() {
-    if (this.value) {
-      editorConfig.initialData = this.value
+    this.editorConfig.custom = {
+      fn: () => {
+        this.recommendPickerModalVisible = true
+      }
     }
 
-    ClassicEditor.create(this.$el, editorConfig)
+    if (this.value) {
+      this.editorConfig.initialData = this.value
+    }
+
+    ClassicEditor.create(this.$refs.textareaRef, this.editorConfig)
       .then(editor => {
         this.$_instance = editor
         this.$_setUpEditorEvents()
