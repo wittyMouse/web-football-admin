@@ -1,4 +1,4 @@
-const typeList = ['充值', '购买文章', '至尊推荐']
+const typeList = { 0: '充值', 1: '购买文章', 2: '至尊推荐', 7: '购买文章推介' }
 
 export default [
   {

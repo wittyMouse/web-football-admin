@@ -31,6 +31,7 @@
                 <a-select-option :value="0">充值</a-select-option>
                 <a-select-option :value="1">购买文章</a-select-option>
                 <a-select-option :value="2">至尊推荐</a-select-option>
+                <a-select-option :value="7">购买文章推介</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
