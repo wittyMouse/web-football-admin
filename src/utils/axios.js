@@ -75,7 +75,8 @@ http.interceptors.response.use(
         keyboard: false,
         onOk: () => {
           clearData()
-          location.href = '/admin'
+          location.href =
+            process.env.NODE_ENV === 'production' ? '/admin' : '/test-admin'
         }
       })
     }
