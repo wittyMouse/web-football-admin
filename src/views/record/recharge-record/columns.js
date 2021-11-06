@@ -1,4 +1,5 @@
-const typeMap = ['系统充值', '微信支付']
+const typeMap = ['系统充值', '微信支付', '支付宝']
+
 export default [
   {
     title: '序号',

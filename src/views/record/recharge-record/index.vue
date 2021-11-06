@@ -38,6 +38,7 @@
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option :value="0">系统充值</a-select-option>
                 <a-select-option :value="1">微信支付</a-select-option>
+                <a-select-option :value="2">支付宝</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
