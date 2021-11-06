@@ -39,5 +39,12 @@ export default [
     title: '标题',
     dataIndex: 'articleTitle',
     align: 'center'
+  },
+  {
+    title: '操作',
+    key: 'options',
+    width: 120,
+    align: 'center',
+    scopedSlots: { customRender: 'options' }
   }
 ]

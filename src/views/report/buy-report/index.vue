@@ -82,7 +82,7 @@
         rowKey="buyRecordId"
         :columns="columns"
         :dataSource="dataSource"
-        :scroll="{ x: 1870 }"
+        :scroll="{ x: 1910 }"
         :pagination="false"
         :rowSelection="{
           selectedRowKeys: selectedRowKeys,
@@ -91,6 +91,11 @@
         :loading="loading"
         size="middle"
       >
+        <template slot="options" slot-scope="text, record">
+          <a @click="onTableClick('view', record)">
+            推介购买列表
+          </a>
+        </template>
       </a-table>
 
       <a-pagination
@@ -113,6 +118,11 @@
       :totalPage="pagination.totalPage"
       @confirm="onExportConfirm"
     />
+
+    <RecommendTableModal
+      :visible.sync="recommendTableModalVisible"
+      :data-source.sync="recommendList"
+    />
   </div>
 </template>
 
@@ -123,11 +133,13 @@ import mixin from '@/mixins'
 import dateRange from '@/mixins/dateRange'
 import columns from './columns'
 import ExportModal from '@/components/ExportModal'
+import RecommendTableModal from './components/RecommendTableModal'
 
 export default {
   name: 'buy-report',
   components: {
-    ExportModal
+    ExportModal,
+    RecommendTableModal
   },
   data() {
     return {
@@ -139,7 +151,9 @@ export default {
       exportModalVisible: false,
       // 选中项
       selectedRowKeys: [],
-      refundLoading: false
+      refundLoading: false,
+      recommendTableModalVisible: false,
+      recommendList: []
     }
   },
   computed: {
@@ -316,6 +330,17 @@ export default {
           })
         }
       })
+    },
+
+    // 表格按钮
+    onTableClick(target, record) {
+      switch (target) {
+        case 'view':
+          // 推介购买列表
+          this.recommendList = record.buyArticleMarketingRecords || []
+          this.recommendTableModalVisible = true
+          break
+      }
     },
 
     // 格式化请求参数
