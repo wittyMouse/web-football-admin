@@ -284,28 +284,32 @@ export default {
       this.form.validateFields((errors, values) => {
         if (errors) return
         // const values = this.form.getFieldsValue()
+        const args = {
+          ...values,
+          articleMarketingList: []
+        }
+
         const div = document.createElement('div')
         div.innerHTML = values.articleURL
         const recommendEl = div.querySelectorAll('.recommend-button')
-        const arr = []
-        recommendEl.forEach((el, index) => {
-          const keys = el.getAttributeNames()
-          const obj = { sortNum: index + 1 }
-          keys.forEach(key => {
-            const name = key.replace('data-', '')
-            if (recommendParams.includes(name)) {
-              const value = el.getAttribute(key)
-              obj[name] = value
-            }
+        if (recommendEl.length > 0) {
+          const arr = []
+          recommendEl.forEach((el, index) => {
+            const keys = el.getAttributeNames()
+            const obj = { sortNum: index + 1 }
+            keys.forEach(key => {
+              const name = key.replace('data-', '')
+              if (recommendParams.includes(name)) {
+                const value = el.getAttribute(key)
+                obj[name] = value
+              }
+            })
+            arr.push(obj)
           })
-          arr.push(obj)
-        })
-        const articleURL = values.articleURL.replace(/\sdata-\w+?=".+?"/g, '')
-        const args = {
-          ...values,
-          articleURL,
-          articleMarketingList: arr
+          args.articleURL = values.articleURL.replace(/\sdata-\w+?=".+?"/g, '')
+          args.articleMarketingList = arr
         }
+
         // if (!values.userId) {
         //   args.userId = ''
         // }

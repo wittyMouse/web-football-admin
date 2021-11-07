@@ -322,33 +322,38 @@ export default {
     onOk() {
       this.form.validateFields((errors, values) => {
         if (errors) return
-        const div = document.createElement('div')
-        div.innerHTML = values.articleURL
-        const recommendEl = div.querySelectorAll('.recommend-button')
-        const arr = []
-        recommendEl.forEach((el, index) => {
-          const keys = el.getAttributeNames()
-          let obj = { sortNum: index + 1 }
-          keys.forEach(key => {
-            const name = key.replace('data-', '')
-            if (recommendParams.includes(name)) {
-              const value = el.getAttribute(key)
-              obj[name] = value
-            }
-          })
-          const i = this.articleMarketingMap[`${obj.proposal}-${obj.amount}`]
-          if (typeof i !== 'undefined') {
-            obj = { ...this.articleMarketingList[i], ...obj }
-          }
-          arr.push(obj)
-        })
-        const articleURL = values.articleURL.replace(/\sdata-\w+?=".+?"/g, '')
+
         const args = {
           ...values,
           id: this.articleDetail.id,
-          articleURL,
-          articleMarketingList: arr
+          articleMarketingList: []
         }
+
+        const div = document.createElement('div')
+        div.innerHTML = values.articleURL
+        const recommendEl = div.querySelectorAll('.recommend-button')
+        if (recommendEl.length > 0) {
+          const arr = []
+          recommendEl.forEach((el, index) => {
+            const keys = el.getAttributeNames()
+            let obj = { sortNum: index + 1 }
+            keys.forEach(key => {
+              const name = key.replace('data-', '')
+              if (recommendParams.includes(name)) {
+                const value = el.getAttribute(key)
+                obj[name] = value
+              }
+            })
+            const i = this.articleMarketingMap[`${obj.proposal}-${obj.amount}`]
+            if (typeof i !== 'undefined') {
+              obj = { ...this.articleMarketingList[i], ...obj }
+            }
+            arr.push(obj)
+          })
+          args.articleURL = values.articleURL.replace(/\sdata-\w+?=".+?"/g, '')
+          args.articleMarketingList = arr
+        }
+
         console.log('article', args)
         this.$emit('submit', args)
       })
