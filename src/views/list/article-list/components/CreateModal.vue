@@ -112,6 +112,13 @@
         ></a-date-picker>
       </a-form-item>
       <a-form-item label="文章内容">
+        <!-- <Editor
+          v-decorator="[
+            'articleURL',
+            { initialValue: '', rules: rules.articleURL }
+          ]"
+          @recommend-picker-submit="onRecommendPickerSubmit"
+        /> -->
         <Editor
           v-decorator="[
             'articleURL',
@@ -127,6 +134,15 @@
 import { hasAuth } from '@/utils'
 import Editor from './CKEditor'
 import debounce from 'lodash/debounce'
+
+// const recommendParams = [
+//   'proposal',
+//   'amount',
+//   'visitingTeam',
+//   'publicationTime'
+// ]
+
+const recommendParams = ['proposal', 'amount']
 
 export default {
   name: 'CreateModal',
@@ -175,6 +191,7 @@ export default {
         format: 'HH:mm'
       },
       keyword: ''
+      // articleMarketingList: []
     }
   },
   computed: {
@@ -188,11 +205,22 @@ export default {
       }
       return this.userList
     }
+    // articleMarketingMap() {
+    //   const obj = {}
+    //   this.articleMarketingList.forEach((item, index) => {
+    //     const { competition, homeTeam, visitingTeam, publicationTime } = item
+    //     obj[
+    //       `${competition}-${homeTeam}-${visitingTeam}-${publicationTime}`
+    //     ] = index
+    //   })
+    //   return obj
+    // }
   },
   methods: {
     hasAuth,
 
     onReset() {
+      // this.articleMarketingList = []
       this.form.resetFields()
     },
 
@@ -208,16 +236,80 @@ export default {
       this.keyword = value
     },
 
+    // 添加推介表单提交
+    // onRecommendPickerSubmit(value) {
+    //   this.articleMarketingList.push(value)
+    // },
+
+    // 确定
+    // onOk() {
+    //   this.form.validateFields((errors, values) => {
+    //     if (errors) return
+    //     const div = document.createElement('div')
+    //     div.innerHTML = values.articleURL
+    //     const recommendEl = div.querySelectorAll('.recommend')
+    //     const arr = []
+    //     recommendEl.forEach(el => {
+    //       const keys = el.getAttributeNames()
+    //       const obj = {}
+    //       keys.forEach(key => {
+    //         const name = key.replace('data-', '').replace('-t', 'T')
+    //         if (recommendParams.includes(name)) {
+    //           const value = el.getAttribute(key)
+    //           obj[name] = value
+    //         }
+    //       })
+    //       const { competition, homeTeam, visitingTeam, publicationTime } = obj
+    //       const keyName = `${competition}-${homeTeam}-${visitingTeam}-${publicationTime}`
+    //       if (typeof this.articleMarketingMap[keyName] !== 'undefined') {
+    //         arr.push(
+    //           this.articleMarketingList[this.articleMarketingMap[keyName]]
+    //         )
+    //       }
+    //     })
+    //     const args = {
+    //       ...values,
+    //       articleMarketingList: arr
+    //     }
+    //     // if (!values.userId) {
+    //     //   args.userId = ''
+    //     // }
+    //     console.log('article', args)
+    //     this.$emit('submit', args)
+    //   })
+    // },
+
     // 确定
     onOk() {
       this.form.validateFields((errors, values) => {
         if (errors) return
+        // const values = this.form.getFieldsValue()
+        const div = document.createElement('div')
+        div.innerHTML = values.articleURL
+        const recommendEl = div.querySelectorAll('.recommend-button')
+        const arr = []
+        recommendEl.forEach((el, index) => {
+          const keys = el.getAttributeNames()
+          const obj = { sortNum: index + 1 }
+          keys.forEach(key => {
+            const name = key.replace('data-', '')
+            if (recommendParams.includes(name)) {
+              const value = el.getAttribute(key)
+              obj[name] = value
+            }
+          })
+          arr.push(obj)
+        })
+        const articleURL = values.articleURL.replace(/\sdata-\w+?=".+?"/g, '')
         const args = {
-          ...values
+          ...values,
+          articleURL,
+          articleMarketingList: arr
         }
         // if (!values.userId) {
         //   args.userId = ''
         // }
+        console.log('article', args)
         this.$emit('submit', args)
       })
     },

@@ -112,6 +112,13 @@
         ></a-date-picker>
       </a-form-item>
       <a-form-item label="文章内容">
+        <!-- <Editor
+          v-decorator="[
+            'articleURL',
+            { initialValue: '', rules: rules.articleURL }
+          ]"
+          @recommend-picker-submit="onRecommendPickerSubmit"
+        /> -->
         <Editor
           v-decorator="[
             'articleURL',
@@ -138,6 +145,14 @@ const formFields = [
   'articleURL',
   'userId'
 ]
+
+// const recommendParams = [
+//   'competition',
+//   'homeTeam',
+//   'visitingTeam',
+//   'publicationTime'
+// ]
+const recommendParams = ['proposal', 'amount']
 
 export default {
   name: 'UpdateModal',
@@ -191,7 +206,8 @@ export default {
       showTime: {
         format: 'HH:mm'
       },
-      keyword: ''
+      keyword: '',
+      articleMarketingList: []
     }
   },
   computed: {
@@ -204,6 +220,14 @@ export default {
         return filterUserList
       }
       return this.userList
+    },
+    articleMarketingMap() {
+      const obj = {}
+      this.articleMarketingList.forEach((item, index) => {
+        const { proposal, amount } = item
+        obj[`${proposal}-${amount}`] = index
+      })
+      return obj
     }
   },
   watch: {
@@ -216,7 +240,18 @@ export default {
               values[key] = this.articleDetail[key]
             }
           }
+          const articleMarketingList = this.articleDetail.articleMarketingList
+          let index = 0
+          values.articleURL = values.articleURL.replace(
+            /class="recommend-button"/g,
+            item => {
+              const { proposal, amount } = articleMarketingList[index]
+              index += 1
+              return `${item} data-proposal="${proposal}" data-amount="${amount}"`
+            }
+          )
           this.form.setFieldsValue(values)
+          this.articleMarketingList = articleMarketingList
         })
       }
     }
@@ -225,6 +260,7 @@ export default {
     hasAuth,
 
     onReset() {
+      this.articleMarketingList = []
       this.form.resetFields()
       this.$emit('update:articleDetail', {})
     },
@@ -241,14 +277,80 @@ export default {
       this.keyword = value
     },
 
+    // 添加推介表单提交
+    // onRecommendPickerSubmit(value) {
+    //   this.articleMarketingList.push(value)
+    // },
+
+    // 确定
+    // onOk() {
+    //   this.form.validateFields((errors, values) => {
+    //     if (errors) return
+    //     const div = document.createElement('div')
+    //     div.innerHTML = values.articleURL
+    //     const recommendEl = div.querySelectorAll('.recommend')
+    //     const arr = []
+    //     recommendEl.forEach(el => {
+    //       const keys = el.getAttributeNames()
+    //       const obj = {}
+    //       keys.forEach(key => {
+    //         const name = key.replace('data-', '').replace('-t', 'T')
+    //         if (recommendParams.includes(name)) {
+    //           const value = el.getAttribute(key)
+    //           obj[name] = value
+    //         }
+    //       })
+    //       const { competition, homeTeam, visitingTeam, publicationTime } = obj
+    //       const keyName = `${competition}-${homeTeam}-${visitingTeam}-${publicationTime}`
+    //       if (typeof this.articleMarketingMap[keyName] !== 'undefined') {
+    //         arr.push(
+    //           this.articleMarketingList[this.articleMarketingMap[keyName]]
+    //         )
+    //       }
+    //     })
+    //     const args = {
+    //       ...values,
+    //       id: this.articleDetail.id,
+    //       articleMarketingList: arr
+    //     }
+    //     console.log('article', args)
+    //     this.$emit('submit', args)
+    //   })
+    // },
+
     // 确定
     onOk() {
       this.form.validateFields((errors, values) => {
         if (errors) return
-        this.$emit('submit', {
-          ...values,
-          id: this.articleDetail.id
+        const div = document.createElement('div')
+        div.innerHTML = values.articleURL
+        const recommendEl = div.querySelectorAll('.recommend-button')
+        const arr = []
+        recommendEl.forEach((el, index) => {
+          const keys = el.getAttributeNames()
+          let obj = { sortNum: index + 1 }
+          keys.forEach(key => {
+            const name = key.replace('data-', '')
+            if (recommendParams.includes(name)) {
+              const value = el.getAttribute(key)
+              obj[name] = value
+            }
+          })
+          const i = this.articleMarketingMap[`${obj.proposal}-${obj.amount}`]
+          if (typeof i !== 'undefined') {
+            obj = { ...this.articleMarketingList[i], ...obj }
+          }
+          arr.push(obj)
         })
+        const articleURL = values.articleURL.replace(/\sdata-\w+?=".+?"/g, '')
+        const args = {
+          ...values,
+          id: this.articleDetail.id,
+          articleURL,
+          articleMarketingList: arr
+        }
+        console.log('article', args)
+        this.$emit('submit', args)
       })
     },
 

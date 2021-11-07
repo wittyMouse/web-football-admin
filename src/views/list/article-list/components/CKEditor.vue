@@ -26,62 +26,62 @@ function uploadAdapterPlugin(editor) {
 }
 
 const editorConfig = {
-  extraPlugins: [uploadAdapterPlugin],
-  toolbar: {
-    items: [
-      'heading',
-      '|',
-      'fontSize',
-      'fontFamily',
-      'fontColor',
-      'fontBackgroundColor',
-      '|',
-      'bold',
-      'italic',
-      'strikethrough',
-      'underline',
-      '|',
-      'bulletedList',
-      'numberedList',
-      'todoList',
-      'alignment',
-      '|',
-      'indent',
-      'outdent',
-      '|',
-      'link',
-      'imageInsert',
-      'insertTable',
-      'mediaEmbed',
-      '|',
-      'customButton',
-      '|',
-      'undo',
-      'redo'
-    ]
-  },
-  image: {
-    toolbar: [
-      'imageTextAlternative',
-      '|',
-      'imageStyle:inline',
-      'imageStyle:block',
-      'imageStyle:side',
-      '|',
-      'linkImage',
-      '|',
-      'imageResize'
-    ]
-  },
-  table: {
-    contentToolbar: [
-      'tableColumn',
-      'tableRow',
-      'mergeTableCells',
-      'tableCellProperties',
-      'tableProperties'
-    ]
-  }
+  extraPlugins: [uploadAdapterPlugin]
+  // toolbar: {
+  //   items: [
+  //     'heading',
+  //     '|',
+  //     'fontSize',
+  //     'fontFamily',
+  //     'fontColor',
+  //     'fontBackgroundColor',
+  //     '|',
+  //     'bold',
+  //     'italic',
+  //     'strikethrough',
+  //     'underline',
+  //     '|',
+  //     'bulletedList',
+  //     'numberedList',
+  //     'todoList',
+  //     'alignment',
+  //     '|',
+  //     'indent',
+  //     'outdent',
+  //     '|',
+  //     'link',
+  //     'imageInsert',
+  //     'insertTable',
+  //     'mediaEmbed',
+  //     '|',
+  //     'recommend',
+  //     '|',
+  //     'undo',
+  //     'redo'
+  //   ]
+  // },
+  // image: {
+  //   toolbar: [
+  //     'imageTextAlternative',
+  //     '|',
+  //     'imageStyle:inline',
+  //     'imageStyle:block',
+  //     'imageStyle:side',
+  //     '|',
+  //     'linkImage',
+  //     '|',
+  //     'imageResize'
+  //   ]
+  // },
+  // table: {
+  //   contentToolbar: [
+  //     'tableColumn',
+  //     'tableRow',
+  //     'mergeTableCells',
+  //     'tableCellProperties',
+  //     'tableProperties'
+  //   ]
+  // }
 }
 
 export default {
@@ -144,12 +144,23 @@ export default {
 
     // 提交选中推介表单
     onRecommendPickerSubmit(values) {
-      this.$_instance.execute('insertCustomButton', values.id)
+      const obj = {}
+      Object.keys(values).forEach(key => {
+        // if (key === 'publicationTime') {
+        //   let temp = values[key].split(' ')[1]
+        //   const idx = temp.lastIndexOf(':')
+        //   obj[key] = temp.slice(0, idx)
+        // } else {
+        obj[key] = (values[key] || '').replace(/\t*/g, '')
+        // }
+      })
+      // this.$emit('recommend-picker-submit', obj)
+      this.$_instance.execute('insertRecommend', obj)
       this.recommendPickerModalVisible = false
     }
   },
   mounted() {
-    this.editorConfig.custom = {
+    this.editorConfig.recommend = {
       fn: () => {
         this.recommendPickerModalVisible = true
       }
