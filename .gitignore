@@ -22,3 +22,6 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+ckeditor.back.js
+ckeditor.back.js.map
