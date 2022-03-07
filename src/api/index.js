@@ -79,7 +79,7 @@ export const updateArticle = params => postAction('/article/update', params)
 export const deleteArticle = params => postAction('/article/delete', params)
 // 批量删除文章
 export const batchDeleteArticle = params =>
-  postAction('/article/batchDelete', params)
+  postAction('/article/deleteBatch', params)
 // 更新文章置顶信息
 export const topArticle = params => postAction('/article/updateIsTop', params)
 // 更新文章推荐信息
@@ -108,6 +108,10 @@ export const deleteRecommend = params => postAction('/marketing/delete', params)
 // 修改至尊推介结果
 export const setRecommendResult = params =>
   postAction('/marketing/setResult', params)
+// 批量删除至尊推介
+export const batchDeleteRecommend = params =>
+  postAction('/marketing/deleteBatch', params)
+// 更新文章置顶信息
 
 // 会员列表
 export const getMemberList = params =>
@@ -164,6 +168,11 @@ export const deleteRanking = params => postAction('/rankingList/delete', params)
 // 账变记录
 export const getOrderRecord = params =>
   postAction('/member/amountChangeListByPage', params)
+// 导出账变记录
+export const exportOrderRecord = params =>
+  postAction('/member/amountChangeListByPageExportExcel', params, {
+    responseType: 'blob'
+  })
 
 // 签到记录
 export const getCheckRecord = params =>
@@ -379,6 +388,7 @@ export default {
   updateRecommend,
   deleteRecommend,
   setRecommendResult,
+  batchDeleteRecommend,
 
   // 会员
   getMemberList,
@@ -406,6 +416,7 @@ export default {
 
   // 账变记录
   getOrderRecord,
+  exportOrderRecord,
 
   // 签到记录
   getCheckRecord,

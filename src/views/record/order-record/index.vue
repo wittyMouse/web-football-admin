@@ -34,6 +34,14 @@
                 <a-select-option :value="7">购买文章推介</a-select-option>
               </a-select>
             </a-form-item>
+            <a-form-item label="帐变时间">
+              <a-range-picker
+                v-decorator="['rangeDate', { initialValue: [] }]"
+                :show-time="showTime"
+                :disabled-date="disabledAfterDate"
+                valueFormat="YYYY-MM-DD HH:mm:ss"
+              ></a-range-picker>
+            </a-form-item>
           </a-col>
         </a-row>
         <a-row>
@@ -43,6 +51,9 @@
             >
             <a-button type="primary" icon="reload" @click="onResetClick"
               >重置</a-button
+            >
+            <a-button type="primary" icon="export" @click="onExportClick"
+              >导出</a-button
             >
           </a-col>
         </a-row>
@@ -72,6 +83,14 @@
         @showSizeChange="handleShowSizeChange"
       />
     </TableBlock>
+
+    <ExportModal
+      :visible.sync="exportModalVisible"
+      :pageSize="pagination.pageSize"
+      :total="pagination.total"
+      :totalPage="pagination.totalPage"
+      @confirm="onExportConfirm"
+    />
   </div>
 </template>
 
@@ -80,15 +99,21 @@ import * as api from '@/api'
 import mixin from '@/mixins'
 import dateRange from '@/mixins/dateRange'
 import columns from './columns'
+import ExportModal from '@/components/ExportModal'
 
 export default {
   name: 'order-record',
+  components: {
+    ExportModal
+  },
   data() {
     return {
       loading: false,
+      exportLoading: false,
       form: this.$form.createForm(this),
       columns,
-      dataSource: []
+      dataSource: [],
+      exportModalVisible: false
     }
   },
   mixins: [mixin, dateRange],
@@ -126,6 +151,37 @@ export default {
         })
     },
 
+    // 导出文件
+    exportOrderRecord(params, cb) {
+      this.exportLoading = true
+      api
+        .exportOrderRecord(params)
+        .then(res => {
+          // console.log(res)
+          const url = URL.createObjectURL(res.data)
+          const disposition = res.headers['content-disposition']
+          let name = ''
+          if (disposition.indexOf('filename') > -1) {
+            name = disposition
+              .split(';')[1]
+              .split('=')[1]
+              .split('.')
+              .map((item, idx) => {
+                if (idx === 0) {
+                  return decodeURIComponent(item)
+                } else {
+                  return item
+                }
+              })
+              .join('.')
+          }
+          cb && cb(url, name)
+        })
+        .finally(() => {
+          this.exportLoading = false
+        })
+    },
+
     // 搜索按钮
     onSearchClick() {
       const { account, nickname } = this.form.getFieldsValue()
@@ -147,13 +203,36 @@ export default {
       this.updateList()
     },
 
+    // 导出按钮
+    onExportClick() {
+      this.exportModalVisible = true
+    },
+
+    // 导出确认按钮
+    onExportConfirm(size) {
+      const params = {
+        ...this.formatParams(),
+        pageNo: 1,
+        pageSize: size
+      }
+      this.exportOrderRecord(params, (url, name) => {
+        this.exportByLink(url, name)
+        this.exportModalVisible = false
+      })
+    },
+
     // 格式化请求参数
     formatParams() {
-      const formData = this.form.getFieldsValue()
-      console.log(formData)
+      const { account, nickname, type, rangeDate } = this.form.getFieldsValue()
+
+      const [buyTimeBegin = '', buyTimeEnd = ''] = rangeDate || []
 
       const params = {
-        ...formData,
+        account,
+        nickname,
+        type,
+        buyTimeBegin,
+        buyTimeEnd,
         pageNo: this.pagination.current,
         pageSize: this.pagination.pageSize
       }

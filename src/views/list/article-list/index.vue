@@ -66,26 +66,26 @@
         <a-button type="primary" icon="plus" @click="onAddClick"
           >写文章</a-button
         >
-        <!-- <a-button
+        <a-button
           v-show="selectSize > 0"
           type="danger"
           icon="delete"
           :loading="batchDeleteLoading"
           @click="handleMultipleDeleteClick"
           >批量删除</a-button
-        > -->
+        >
       </template>
 
-      <!-- <a-alert class="article-list-alert" type="info">
+      <a-alert class="article-list-alert" type="info">
         <template #message>
           <span
             >已选择 <a class="link disabled">{{ selectSize }}</a> 项</span
           >
           <a @click="handleSelectClean">清空</a>
         </template>
-      </a-alert> -->
+      </a-alert>
 
-      <!-- <a-table
+      <a-table
         rowKey="id"
         :columns="columns"
         :dataSource="dataSource"
@@ -94,48 +94,6 @@
           selectedRowKeys: selectedRowKeys,
           onChange: onSelectChange
         }"
-        :loading="loading"
-        size="middle"
-      >
-        <template slot="options" slot-scope="text, record">
-          <a @click="onEditClick(record)">编辑</a>
-          <a-divider type="vertical" />
-          <a @click="onDeleteClick(record)">删除</a>
-          <template
-            v-if="
-              hasAuth(userPermissionMap, $route.name, 'top') ||
-                hasAuth(userPermissionMap, $route.name, 'recommend')
-            "
-          >
-            <a-divider type="vertical" />
-            <a-dropdown>
-              <a>更多 <a-icon type="down"/></a>
-              <a-menu slot="overlay">
-                <a-menu-item
-                  v-show="hasAuth(userPermissionMap, $route.name, 'top')"
-                >
-                  <a @click="onTopClick(record)">{{
-                    record.isTop ? '取消置顶' : '置顶'
-                  }}</a>
-                </a-menu-item>
-                <a-menu-item
-                  v-show="hasAuth(userPermissionMap, $route.name, 'recommend')"
-                >
-                  <a @click="onRecommendClick(record)">{{
-                    record.isRecommend ? '取消推荐' : '推荐'
-                  }}</a>
-                </a-menu-item>
-              </a-menu>
-            </a-dropdown>
-          </template>
-        </template>
-      </a-table> -->
-
-      <a-table
-        rowKey="id"
-        :columns="columns"
-        :dataSource="dataSource"
-        :pagination="false"
         :loading="loading"
         size="middle"
       >
@@ -229,6 +187,7 @@ export default {
       topLoading: false,
       recommendLoading: false,
       columnListLoading: false,
+      userListLoading: false,
       form: this.$form.createForm(this),
       columns,
       dataSource: [],
@@ -238,7 +197,6 @@ export default {
       updateModalVisible: false,
       articleDetail: {},
       columnList: [],
-      userListLoading: false,
       userList: []
     }
   },

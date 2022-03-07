@@ -8,7 +8,9 @@ export const CONFIG = {
     '/sys/user/delete',
     '/sys/user/deleteBatch',
     '/sys/permission/delete',
-    '/sys/permission/deleteBatch'
+    '/sys/permission/deleteBatch',
+    '/article/deleteBatch',
+    '/marketing/deleteBatch'
   ]
 }
 
