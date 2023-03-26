@@ -50,14 +50,14 @@
         }}</a-col>
       </a-row>
 
-      <a-row class="recharge-info-modal-item">
+      <!-- <a-row class="recharge-info-modal-item">
         <a-col class="recharge-info-modal-label" :span="8"
           >充值后{{ target ? rechargeTarget[target] : '' }}：</a-col
         >
         <a-col class="recharge-info-modal-value" :span="16">{{
           rechargeInfo.afterValue
         }}</a-col>
-      </a-row>
+      </a-row> -->
 
       <a-row class="recharge-info-modal-item" v-show="target === 'coin'">
         <a-col class="recharge-info-modal-label" :span="8">充值方式：</a-col>
@@ -66,12 +66,12 @@
         }}</a-col>
       </a-row>
 
-      <a-row class="recharge-info-modal-item">
+      <!-- <a-row class="recharge-info-modal-item">
         <a-col class="recharge-info-modal-label" :span="8">订单号：</a-col>
         <a-col class="recharge-info-modal-value" :span="16">{{
           rechargeInfo.orderId
         }}</a-col>
-      </a-row>
+      </a-row> -->
     </div>
   </a-modal>
 </template>

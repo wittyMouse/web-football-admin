@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :visible="visible"
-    title="编辑渠道"
+    title="修改密码"
     :width="600"
     :afterClose="afterClose"
     @ok="onOk"
@@ -13,41 +13,66 @@
       :wrapper-col="{ span: 20 }"
       autocomplete="off"
     >
-      <a-form-item label="渠道名称">
+      <a-form-item label="编号">
+        <a-input
+          v-decorator="['memberId', { initialValue: '' }]"
+          placeholder="请输入编号"
+          disabled
+        ></a-input>
+      </a-form-item>
+      <a-form-item label="账号">
+        <a-input
+          v-decorator="['account', { initialValue: '' }]"
+          placeholder="请输入账号"
+          disabled
+        ></a-input>
+      </a-form-item>
+      <a-form-item label="昵称">
         <a-input
           v-decorator="[
-            'channelName',
-            { initialValue: '', rules: rules.channelName }
+            'nickname',
+            { initialValue: '', rules: rules.nickname }
           ]"
-          placeholder="请输入渠道名称"
+          placeholder="请输入昵称"
+          disabled
         ></a-input>
+      </a-form-item>
+      <a-form-item label="密码">
+        <a-input-password
+          v-decorator="['pwd', { initialValue: '', rules: rules.pwd }]"
+          placeholder="请输入密码"
+        ></a-input-password>
       </a-form-item>
     </a-form>
   </a-modal>
 </template>
 
 <script>
-const formFields = ['channelName']
+const formFields = ['memberId', 'account', 'nickname']
 
 export default {
-  name: 'UpdateModal',
+  name: 'ChangePasswordModal',
   props: {
     visible: {
       type: Boolean,
       default: false
     },
-    channelDetail: {
+    memberDetail: {
       type: Object,
       default() {
         return {}
       }
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
       form: this.$form.createForm(this),
       rules: {
-        channelName: [{ required: true, message: '请输入渠道名称' }]
+        pwd: [{ required: true, message: '请输入密码' }]
       }
     }
   },
@@ -56,9 +81,9 @@ export default {
       if (val) {
         this.$nextTick(() => {
           const values = {}
-          for (let key in this.channelDetail) {
+          for (let key in this.memberDetail) {
             if (formFields.includes(key)) {
-              values[key] = this.channelDetail[key]
+              values[key] = this.memberDetail[key]
             }
           }
           this.form.setFieldsValue(values)
@@ -69,7 +94,7 @@ export default {
   methods: {
     onReset() {
       this.form.resetFields()
-      this.$emit('update:channelDetail', {})
+      this.$emit('update:memberDetail', {})
     },
 
     // 完全关闭后
@@ -82,11 +107,11 @@ export default {
     onOk() {
       this.form.validateFields((errors, values) => {
         if (errors) return
-        // console.log(values)
-        this.$emit('submit', {
+        const args = {
           ...values,
-          id: this.channelDetail.id
-        })
+          id: this.memberDetail.id
+        }
+        this.$emit('submit', args)
       })
     },
 

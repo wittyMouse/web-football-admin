@@ -11,11 +11,11 @@ export default [
     dataIndex: 'columnName',
     align: 'center'
   },
-  {
-    title: '父级栏目',
-    dataIndex: 'parentId',
-    align: 'center'
-  },
+  // {
+  //   title: '父级栏目',
+  //   dataIndex: 'parentId',
+  //   align: 'center'
+  // },
   {
     title: '栏目提示',
     dataIndex: 'prompt',
@@ -31,16 +31,16 @@ export default [
     dataIndex: 'columnStatus',
     align: 'center',
     customRender: text => statusList[text]
-  },
+  }
   // {
   //   title: '页面模板',
   //   dataIndex: 'template',
   //   align: 'center'
   // },
-  {
-    title: '操作',
-    key: 'options',
-    align: 'center',
-    scopedSlots: { customRender: 'options' }
-  }
+  // {
+  //   title: '操作',
+  //   key: 'options',
+  //   align: 'center',
+  //   scopedSlots: { customRender: 'options' }
+  // }
 ]

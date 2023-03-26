@@ -2,7 +2,7 @@
   <aside class="the-sider the-sider--layout">
     <a class="the-sider__header" href="/">
       <img class="the-sider__logo" src="../assets/images/logo.svg" alt="logo" />
-      <h3 class="the-sider__title" v-if="!collapsed">巅峰后台</h3>
+      <h3 class="the-sider__title" v-if="!collapsed">好球后台</h3>
     </a>
 
     <el-scrollbar
@@ -45,6 +45,10 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+// import cloneDeep from 'lodash/cloneDeep'
+// import get from 'lodash/get'
+// import { findIndexByProp } from '@/utils'
+
 export default {
   name: 'TheSider',
   props: {
@@ -55,6 +59,27 @@ export default {
   },
   computed: {
     ...mapState(['menuList', 'selectedMenu', 'openSubMenu'])
+    // formatMenuList() {
+    //   // 去除栏目列表
+    //   if (Array.isArray(this.menuList)) {
+    //     const indexs = findIndexByProp(
+    //       this.menuList,
+    //       'path',
+    //       '/list/column-list'
+    //     )
+    //     if (Array.isArray(indexs)) {
+    //       const lastIndex = indexs.pop()
+    //       const cloneMenuList = cloneDeep(this.menuList)
+    //       const target = get(cloneMenuList, indexs)
+    //       target.children.splice(lastIndex, 1)
+    //       return cloneMenuList
+    //     } else {
+    //       return this.menuList
+    //     }
+    //   } else {
+    //     return this.menuList
+    //   }
+    // }
   },
   methods: {
     ...mapActions(['updateOpenSubMenu']),

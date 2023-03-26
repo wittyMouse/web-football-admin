@@ -33,9 +33,9 @@
                 <a-select-option :value="2">正常</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="最后登录">
+            <!-- <a-form-item label="最后登录">
               <a-range-picker
-                v-decorator="['rangeDate', { initialValue: [] }]"
+                v-decorator="['rangeDate', { initialValue: tempArray }]"
                 :show-time="showTime"
                 :disabled-date="disabledAfterDate"
                 valueFormat="YYYY-MM-DD HH:mm:ss"
@@ -60,7 +60,7 @@
                   >{{ item.channelName }}</a-select-option
                 >
               </a-select>
-            </a-form-item>
+            </a-form-item> -->
           </a-col>
         </a-row>
         <a-row>
@@ -71,15 +71,51 @@
             <a-button type="primary" icon="reload" @click="onResetClick"
               >重置</a-button
             >
-            <a-button type="primary" icon="export" @click="onExportClick"
+            <!-- <a-button type="primary" icon="export" @click="onExportClick"
               >导出</a-button
-            >
+            > -->
           </a-col>
         </a-row>
       </a-form>
     </SearchBar>
 
     <TableBlock title="会员列表">
+      <template #option>
+        <a-button type="primary" icon="plus" @click="onAddClick"
+          >新增会员</a-button
+        >
+        <!-- <a-button
+          v-show="selectSize > 0"
+          type="danger"
+          icon="delete"
+          :loading="batchDeleteLoading"
+          @click="handleMultipleDeleteClick"
+          >批量删除</a-button
+        > -->
+      </template>
+
+      <!-- <a-alert class="member-list-alert" type="info">
+        <template #message>
+          <span
+            >已选择 <a class="link disabled">{{ selectSize }}</a> 项</span
+          >
+          <a @click="handleSelectClean">清空</a>
+        </template>
+      </a-alert> -->
+
+      <!-- <a-table
+        rowKey="id"
+        :columns="columns"
+        :dataSource="dataSource"
+        :scroll="{ x: 1810 }"
+        :pagination="false"
+        :rowSelection="{
+          selectedRowKeys: selectedRowKeys,
+          onChange: onSelectChange
+        }"
+        :loading="loading"
+        size="middle"
+      > -->
       <a-table
         rowKey="id"
         :columns="columns"
@@ -89,22 +125,32 @@
         :loading="loading"
         size="middle"
       >
-        <template slot="mobile" slot-scope="text">{{
+        <template slot="avatar" slot-scope="text">
+          <div class="member-list-avatar">
+            <img :src="text" alt="avatar" />
+          </div>
+        </template>
+
+        <!-- <template slot="mobile" slot-scope="text">{{
           hasAuth(userPermissionMap, $route.name, 'fullPhone')
             ? text
             : phoneNumberFilter(text)
-        }}</template>
+        }}</template> -->
 
         <template slot="options" slot-scope="text, record">
           <a @click="onUpdateClick(record)">修改会员信息</a>
           <a-divider type="vertical" />
           <a @click="onTableClick('points', record)">积分充值</a>
           <a-divider type="vertical" />
+          <a @click="onTableClick('change-password', record)">修改密码</a>
+          <!-- <a-divider type="vertical" />
+          <a @click="onDeleteClick(record)">删除</a>
+          <a-divider type="vertical" />
           <a @click="onTableClick('coin', record)">金币充值</a>
           <a-divider type="vertical" />
           <a @click="onTableClick('experience', record)">经验值修改</a>
           <a-divider type="vertical" />
-          <a @click="onTableClick('free', record)">赠送推介</a>
+          <a @click="onTableClick('free', record)">赠送推介</a> -->
         </template>
       </a-table>
 
@@ -121,21 +167,32 @@
       />
     </TableBlock>
 
+    <CreateModal
+      :visible.sync="createModalVisible"
+      :loading="addLoading"
+      @submit="onCreateSubmit"
+    />
+
+    <UpdateModal
+      :visible.sync="updateModalVisible"
+      :memberDetail.sync="memberDetail"
+      :loading="updateLoading"
+      @submit="onUpdateSubmit"
+    />
+
+    <ChangePasswordModal
+      :visible.sync="changePasswordModalVisible"
+      :memberDetail.sync="memberDetail"
+      :loading="updateMemberPasswordLoading"
+      @submit="onChangePasswordSubmit"
+    />
+
     <ExportModal
       :visible.sync="exportModalVisible"
       :pageSize="pagination.pageSize"
       :total="pagination.total"
       :totalPage="pagination.totalPage"
       @confirm="onExportConfirm"
-    />
-
-    <UpdateModal
-      :visible.sync="updateModalVisible"
-      :memberDetail.sync="memberDetail"
-      :loading="resetPasswordLoading"
-      :userPermissionMap="userPermissionMap"
-      @submit="onUpdateSubmit"
-      @reset="onResetPassword"
     />
 
     <RechargeModal
@@ -174,8 +231,10 @@ import { phoneNumberFilter } from '@/utils'
 import mixin from '@/mixins'
 import dateRange from '@/mixins/dateRange'
 import columns from './columns'
-import ExportModal from '@/components/ExportModal'
+import CreateModal from './components/CreateModal'
 import UpdateModal from './components/UpdateModal'
+import ChangePasswordModal from './components/ChangePasswordModal'
+import ExportModal from '@/components/ExportModal'
 import RechargeModal from './components/RechargeModal'
 import RechargeInfoModal from './components/RechargeInfoModal'
 import FreeRecommendModal from './components/FreeRecommendModal'
@@ -184,8 +243,10 @@ import ExperienceModal from './components/ExperienceModal'
 export default {
   name: 'member-list',
   components: {
-    ExportModal,
+    CreateModal,
     UpdateModal,
+    ChangePasswordModal,
+    ExportModal,
     RechargeModal,
     RechargeInfoModal,
     FreeRecommendModal,
@@ -194,15 +255,23 @@ export default {
   data() {
     return {
       loading: false,
+      addLoading: false,
+      updateLoading: false,
+      updateMemberPasswordLoading: false,
+      deleteLoading: false,
+      batchDeleteLoading: false,
       rechargeLoading: false,
       integralRechargeLoading: false,
-      updateLoading: false,
       exportLoading: false,
       form: this.$form.createForm(this),
       columns,
       dataSource: [],
-      exportModalVisible: false,
+      // 选中项
+      selectedRowKeys: [],
+      createModalVisible: false,
       updateModalVisible: false,
+      changePasswordModalVisible: false,
+      exportModalVisible: false,
       rechargeModalVisible: false,
       rechargeInfoModalVisible: false,
       freeRecommendModalVisible: false,
@@ -217,15 +286,30 @@ export default {
       userList: [],
       freeReommendLoading: false,
       changeExperienceLoading: false,
-      levelList: []
+      levelList: [],
+
+      tempArray: []
     }
   },
   computed: {
-    ...mapState(['userPermissionMap'])
+    ...mapState(['userPermissionMap']),
+    selectSize() {
+      return this.selectedRowKeys.length
+    }
   },
   mixins: [mixin, dateRange],
   methods: {
     phoneNumberFilter,
+
+    // 选中项发生变化时的回调
+    onSelectChange(selectedRowKeys) {
+      this.selectedRowKeys = selectedRowKeys
+    },
+
+    // 清空选中项
+    handleSelectClean() {
+      this.selectedRowKeys = []
+    },
 
     // 页码改变的回调，参数是改变后的页码及每页条数
     handlePaginationChange(page, pageSize) {
@@ -257,6 +341,78 @@ export default {
         })
         .finally(() => {
           this.loading = false
+        })
+    },
+
+    // 添加会员
+    addMember(params, cb) {
+      this.addLoading = true
+      api
+        .addMember(params)
+        .then(res => {
+          if (res.code === 0) {
+            this.$_message.success(res.message)
+            cb && cb()
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.addLoading = false
+        })
+    },
+
+    // 更新会员
+    updateMember(params, cb) {
+      this.updateLoading = true
+      api
+        .updateMember(params)
+        .then(res => {
+          if (res.code === 0) {
+            this.$_message.success(res.message)
+            cb && cb()
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.updateLoading = false
+        })
+    },
+
+    // 删除会员
+    deleteMember(params, cb) {
+      this.deleteLoading = true
+      api
+        .deleteMember(params)
+        .then(res => {
+          if (res.code === 0) {
+            this.$_message.success(res.message)
+            cb && cb()
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.deleteLoading = false
+        })
+    },
+
+    // 批量删除会员
+    batchDeleteMember(params, cb) {
+      this.batchDeleteLoading = true
+      api
+        .batchDeleteMember(params)
+        .then(res => {
+          if (res.code === 0) {
+            this.$_message.success(res.message)
+            cb && cb()
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.batchDeleteLoading = false
         })
     },
 
@@ -342,6 +498,23 @@ export default {
         })
         .finally(() => {
           this.updateLoading = false
+        })
+    },
+
+    // 修改密码
+    updateMemberPassword(params, cb) {
+      this.updateMemberPasswordLoading = true
+      api
+        .updateMemberPassword(params)
+        .then(res => {
+          if (res.code === 0) {
+            cb && cb()
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.updateMemberPasswordLoading = false
         })
     },
 
@@ -449,11 +622,12 @@ export default {
 
     // 搜索按钮
     onSearchClick() {
-      const { account, nickname, mobile } = this.form.getFieldsValue()
+      // const { account, nickname, mobile } = this.form.getFieldsValue()
+      const { account, nickname } = this.form.getFieldsValue()
       this.form.setFieldsValue({
         account: account.trim(),
-        nickname: nickname.trim(),
-        mobile: mobile.trim()
+        nickname: nickname.trim()
+        // mobile: mobile.trim()
       })
 
       this.pagination.current = 1
@@ -467,6 +641,106 @@ export default {
       this.pagination.current = 1
       this.pagination.pageSize = 10
       this.updateList()
+    },
+
+    // 添加按钮
+    onAddClick() {
+      this.getUserList()
+      this.createModalVisible = true
+    },
+
+    // 批量删除
+    handleMultipleDeleteClick() {
+      this.$confirm({
+        title: '提示',
+        content: `确定要删除选中会员吗？`,
+        keyboard: false,
+        onOk: () => {
+          const params = {
+            ids: this.selectedRowKeys.join(',')
+          }
+          this.batchDeleteMember(params, () => {
+            this.selectedRowKeys = []
+            this.pagination.current = 1
+            this.pagination.pageSize = 10
+            this.updateList()
+          })
+        }
+      })
+    },
+
+    // 编辑按钮
+    onEditClick(record) {
+      this.getUserList()
+      record.channelId = record.channelId + ''
+      this.memberDetail = record
+      this.updateModalVisible = true
+    },
+
+    // 提交添加表单
+    onCreateSubmit(values) {
+      console.log('create', values)
+      const params = {
+        ...values
+      }
+      this.addMember(params, () => {
+        this.updateList()
+        this.createModalVisible = false
+      })
+    },
+
+    // 提交更新表单
+    onUpdateSubmit(values) {
+      console.log('update', values)
+      // const params = {
+      //   ...values
+      // }
+
+      const { id, account, nickname, status } = values
+      this.updateLoading = true
+      Promise.all([
+        api.updateMember({ id, account, nickname }),
+        api.updateMemberStatus({ id, status })
+      ])
+        .then(() => {
+          this.updateList()
+          this.updateModalVisible = false
+          this.$success({
+            title: '提示',
+            content: '用户信息修改成功'
+          })
+        })
+        .finally(() => {
+          this.updateLoading = false
+        })
+    },
+
+    // 修改密码提交更新表单
+    onChangePasswordSubmit(values) {
+      console.log('changePassword', values)
+      const { id, pwd } = values
+      const params = { id, pwd }
+      this.updateMemberPassword(params, () => {
+        this.updateList()
+        this.changePasswordModalVisible = false
+        this.$success({
+          title: '提示',
+          content: '修改密码成功'
+        })
+      })
+    },
+
+    // 删除按钮
+    onDeleteClick(record) {
+      const { id, nickname } = record
+      this.$confirm({
+        title: `是否删除会员【${nickname}】`,
+        onOk: () => {
+          this.deleteMember({ id }, () => {
+            this.updateList()
+          })
+        }
+      })
     },
 
     // 导出按钮
@@ -512,33 +786,36 @@ export default {
           this.getLevelConfig()
           this.experienceModalVisible = true
           break
+        case 'change-password':
+          this.changePasswordModalVisible = true
+          break
       }
     },
 
     // 点击重置密码
-    onResetPassword({ id }) {
-      // console.log(id)
-      const params = { id }
-      this.resetPassword(params, () => {
-        this.$success({
-          title: '提示',
-          content: '用户密码重置成功，默认密码为：123456'
-        })
-      })
-    },
+    // onResetPassword({ id }) {
+    //   // console.log(id)
+    //   const params = { id }
+    //   this.resetPassword(params, () => {
+    //     this.$success({
+    //       title: '提示',
+    //       content: '用户密码重置成功，默认密码为：123456'
+    //     })
+    //   })
+    // },
 
-    // 提交修改会员状态表单
-    onUpdateSubmit(values) {
-      console.log('update', values)
-      this.updateMemberStatus(values, () => {
-        this.updateList()
-        this.updateModalVisible = false
-        this.$success({
-          title: '提示',
-          content: '用户信息修改成功'
-        })
-      })
-    },
+    // // 提交修改会员状态表单
+    // onUpdateSubmit(values) {
+    //   console.log('update', values)
+    //   this.updateMemberStatus(values, () => {
+    //     this.updateList()
+    //     this.updateModalVisible = false
+    //     this.$success({
+    //       title: '提示',
+    //       content: '用户信息修改成功'
+    //     })
+    //   })
+    // },
 
     // 提交充值表单
     onRechargeSubmit(values) {
@@ -560,9 +837,15 @@ export default {
           // 充值积分
           rechargeInfo.beforeValue = integral
           rechargeInfo.value = values.integral
-          this.integralRecharge(values, res => {
-            rechargeInfo.orderId = res.orderId
-            rechargeInfo.afterValue = res.balance
+          // this.integralRecharge(values, res => {
+          //   rechargeInfo.orderId = res.orderId
+          //   rechargeInfo.afterValue = res.balance
+          //   this.updateList()
+          //   this.rechargeModalVisible = false
+          //   this.rechargeInfo = rechargeInfo
+          //   this.rechargeInfoModalVisible = true
+          // })
+          this.integralRecharge(values, () => {
             this.updateList()
             this.rechargeModalVisible = false
             this.rechargeInfo = rechargeInfo
@@ -617,22 +900,22 @@ export default {
         account,
         nickname,
         status,
-        rangeDate,
-        mobile,
-        channelId
+        // rangeDate
+        // mobile,
+        // channelId
       } = this.form.getFieldsValue()
 
-      const [lastLoginTimeBegin, lastLoginTimeEnd] =
-        rangeDate.length > 0 ? rangeDate : ['', '']
+      // const [lastLoginTimeBegin, lastLoginTimeEnd] =
+      //   rangeDate.length > 0 ? rangeDate : ['', '']
 
       const params = {
         account,
         nickname,
         status,
-        mobile,
-        channelId,
-        lastLoginTimeBegin,
-        lastLoginTimeEnd,
+        // mobile,
+        // channelId,
+        // lastLoginTimeBegin,
+        // lastLoginTimeEnd,
         pageNo: this.pagination.current,
         pageSize: this.pagination.pageSize
       }
@@ -647,7 +930,7 @@ export default {
     }
   },
   mounted() {
-    this.getChannelConfig()
+    // this.getChannelConfig()
     this.getUserList()
     this.updateList()
   }
@@ -659,6 +942,28 @@ export default {
   .ant-pagination {
     float: right;
     margin: 16px 0;
+  }
+}
+
+.member-list-alert {
+  margin: 0 24px 16px;
+
+  .ant-alert-message {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.member-list-avatar {
+  margin: 0 auto;
+  width: 40px;
+  height: 40px;
+  font-size: 0;
+
+  & img {
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

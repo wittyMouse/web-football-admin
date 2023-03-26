@@ -149,3 +149,19 @@ export function hasAuth(userPermissionMap, routeName, perms) {
     false
   )
 }
+
+export function findIndexByProp(arr, prop, value) {
+  for (let i = 0; i < arr.length; i++) {
+    const obj = arr[i]
+    if (obj[prop] === value) {
+      return i
+    }
+    if (Array.isArray(obj['children'])) {
+      const index = findIndexByProp(obj['children'], prop, value)
+      if (index !== -1) {
+        return [i, index]
+      }
+    }
+  }
+  return -1
+}

@@ -23,6 +23,22 @@
           placeholder="请输入文章标题"
         ></a-input>
       </a-form-item>
+      <a-form-item label="分类">
+        <a-select
+          v-decorator="[
+            'channelId',
+            {
+              initialValue: undefined,
+              rules: rules.channelId
+            }
+          ]"
+          placeholder="请选择分类"
+        >
+          <a-select-option v-for="item in channelList" :key="item.channelId">{{
+            item.channelName
+          }}</a-select-option>
+        </a-select>
+      </a-form-item>
       <a-row>
         <a-col :span="12">
           <a-form-item
@@ -77,18 +93,21 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <a-form-item label="购买金币数">
+      <a-form-item label="购买积分数">
         <a-input
-          v-decorator="['amount', { initialValue: '', rules: rules.amount }]"
-          placeholder="请输入文章购买金币数"
+          v-decorator="[
+            'integral',
+            { initialValue: '', rules: rules.integral }
+          ]"
+          placeholder="请输入文章购买积分数"
         ></a-input>
       </a-form-item>
-      <a-form-item label="折扣规则">
+      <!-- <a-form-item label="折扣规则">
         <a-input
           v-decorator="['discount', { initialValue: '' }]"
           placeholder="折扣规则，如没折扣请留空"
         ></a-input>
-      </a-form-item>
+      </a-form-item> -->
       <a-form-item label="发布时间">
         <a-date-picker
           v-decorator="[
@@ -114,15 +133,15 @@
       <a-form-item label="文章内容">
         <!-- <Editor
           v-decorator="[
-            'articleURL',
-            { initialValue: '', rules: rules.articleURL }
+            'articleContent',
+            { initialValue: '', rules: rules.articleContent }
           ]"
           @recommend-picker-submit="onRecommendPickerSubmit"
         /> -->
         <Editor
           v-decorator="[
-            'articleURL',
-            { initialValue: '', rules: rules.articleURL }
+            'articleContent',
+            { initialValue: '', rules: rules.articleContent }
           ]"
         />
       </a-form-item>
@@ -134,15 +153,16 @@
 import { hasAuth } from '@/utils'
 import Editor from './CKEditor'
 import debounce from 'lodash/debounce'
+import { channelList } from '../config'
 
 // const recommendParams = [
 //   'proposal',
-//   'amount',
+//   'integral',
 //   'visitingTeam',
 //   'publicationTime'
 // ]
 
-const recommendParams = ['proposal', 'amount']
+const recommendParams = ['proposal', 'integral']
 
 export default {
   name: 'CreateModal',
@@ -180,13 +200,15 @@ export default {
       form: this.$form.createForm(this),
       rules: {
         articleTitle: [{ required: true, message: '请输入文章标题' }],
+        channelId: [{ required: true, message: '请选择分类' }],
         columnId: [{ required: true, message: '请选择栏目' }],
         userId: [{ required: true, message: '请选择作者' }],
-        amount: [{ required: true, message: '请输入购买金币数' }],
+        integral: [{ required: true, message: '请输入购买积分数' }],
         publicationTime: [{ required: true, message: '请选择发布时间' }],
         disclosureTime: [{ required: true, message: '请选择公开时间' }],
-        articleURL: [{ required: true, message: '请输入文章内容' }]
+        articleContent: [{ required: true, message: '请输入文章内容' }]
       },
+      channelList,
       showTime: {
         format: 'HH:mm'
       },
@@ -246,7 +268,7 @@ export default {
     //   this.form.validateFields((errors, values) => {
     //     if (errors) return
     //     const div = document.createElement('div')
-    //     div.innerHTML = values.articleURL
+    //     div.innerHTML = values.articleContent
     //     const recommendEl = div.querySelectorAll('.recommend')
     //     const arr = []
     //     recommendEl.forEach(el => {
@@ -290,7 +312,7 @@ export default {
         }
 
         const div = document.createElement('div')
-        div.innerHTML = values.articleURL
+        div.innerHTML = values.articleContent
         const recommendEl = div.querySelectorAll('.recommend-button')
         if (recommendEl.length > 0) {
           const arr = []
@@ -306,7 +328,10 @@ export default {
             })
             arr.push(obj)
           })
-          args.articleURL = values.articleURL.replace(/\sdata-\w+?=".+?"/g, '')
+          args.articleContent = values.articleContent.replace(
+            /\sdata-\w+?=".+?"/g,
+            ''
+          )
           args.articleMarketingList = arr
         }
 

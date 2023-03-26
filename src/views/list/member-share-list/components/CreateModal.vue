@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :visible="visible"
-    title="添加广告"
+    title="添加会员发布"
     :width="600"
     :afterClose="afterClose"
     @ok="onOk"
@@ -13,28 +13,40 @@
       :wrapper-col="{ span: 20 }"
       autocomplete="off"
     >
-      <a-form-item label="名称">
-        <a-input
-          v-decorator="['name', { initialValue: '', rules: rules.name }]"
-          placeholder="请输入名称"
-        ></a-input>
-      </a-form-item>
-      <a-form-item label="位置">
+      <a-form-item label="会员">
         <a-select
           v-decorator="[
-            'location',
-            { initialValue: undefined, rules: rules.location }
+            'memberId',
+            {
+              initialValue: undefined,
+              rules: rules.memberId
+            }
           ]"
-          placeholder="请选择位置"
+          placeholder="请选择会员"
+          show-search
+          :filter-option="false"
+          @search="onSelectSearch"
         >
-          <a-select-option v-for="(item, index) in positionList" :key="index">{{
-            item
-          }}</a-select-option>
+          <a-select-option
+            v-for="item in filterMemberList"
+            :key="item.memberId"
+            >{{ item.nickname }}</a-select-option
+          >
         </a-select>
       </a-form-item>
-      <a-form-item class="system-advertisement-form-item" label="图片">
+      <a-form-item label="类型">
+        <a-select
+          v-decorator="['type', { initialValue: undefined, rules: rules.type }]"
+          placeholder="请选择类型"
+        >
+          <a-select-option v-for="item in typeList" :key="item.typeId">
+            {{ item.typeName }}
+          </a-select-option>
+        </a-select>
+      </a-form-item>
+      <a-form-item class="member-share-form-item" label="图片">
         <a-upload
-          class="system-advertisement-form-item-upload"
+          class="member-share-form-item-upload"
           v-decorator="[
             'imageUrl',
             {
@@ -50,7 +62,7 @@
           :headers="uploadHeaders"
         >
           <img
-            class="system-advertisement-upload-image"
+            class="member-share-upload-image"
             :src="imageUrl"
             alt="avatar"
             v-if="imageUrl"
@@ -60,37 +72,19 @@
           </div>
         </a-upload>
       </a-form-item>
-      <a-form-item label="链接">
-        <a-textarea
-          v-decorator="['pageUrl', { initialValue: '' }]"
-          placeholder="请输入链接"
-        ></a-textarea>
-      </a-form-item>
-      <a-form-item label="权重">
+      <a-form-item label="中奖金额">
         <a-input
-          v-decorator="['weight', { initialValue: '', rules: rules.weight }]"
-          placeholder="请输入权重"
-          addon-after="%"
+          v-decorator="['amount', { initialValue: '', rules: rules.amount }]"
+          placeholder="请输入中奖金额"
         ></a-input>
-      </a-form-item>
-      <a-form-item label="到期时间">
-        <a-date-picker
-          v-decorator="[
-            'expiryDate',
-            { initialValue: '', rules: rules.expiryDate }
-          ]"
-          :show-time="showTime"
-          format="YYYY-MM-DD HH:mm"
-          valueFormat="YYYY-MM-DD HH:mm"
-          placeholder="请选择到期时间"
-        />
       </a-form-item>
     </a-form>
   </a-modal>
 </template>
 
 <script>
-import moment from 'moment'
+import debounce from 'lodash/debounce'
+import { typeList } from '../config'
 
 export default {
   name: 'CreateModal',
@@ -99,7 +93,7 @@ export default {
       type: Boolean,
       default: false
     },
-    positionList: {
+    memberList: {
       type: Array,
       default() {
         return []
@@ -107,15 +101,15 @@ export default {
     }
   },
   data() {
+    this.onSelectSearch = debounce(this.onSelectSearch, 500)
+
     return {
       form: this.$form.createForm(this),
       rules: {
-        name: [{ required: true, message: '请输入名称' }],
-        location: [{ required: true, message: '请选择位置' }],
+        memberId: [{ required: true, message: '请选择会员' }],
+        type: [{ required: true, message: '请选择类型' }],
         imageUrl: [{ required: true, message: '请上传图片' }],
-        pageUrl: [{ required: true, message: '请输入链接' }],
-        weight: [{ required: true, message: '请输入权重' }],
-        expiryDate: [{ required: true, message: '请选择到期时间' }]
+        amount: [{ required: true, message: '请输入中奖金额' }]
       },
       uploadHeaders: {
         'X-Access-Token': window.sessionStorage.getItem('token')
@@ -123,10 +117,20 @@ export default {
       fileList: [],
       uploading: false,
       imageUrl: '',
-      showTime: {
-        format: 'HH:mm',
-        defaultValue: moment('00:00', 'HH:mm')
+      typeList,
+      keyword: ''
+    }
+  },
+  computed: {
+    filterMemberList() {
+      if (this.keyword) {
+        const filterMemberList = this.memberList.filter(
+          item => item.nickname.indexOf(this.keyword) > -1
+        )
+        // console.log('filterMemberList', filterMemberList)
+        return filterMemberList
       }
+      return this.memberList
     }
   },
   methods: {
@@ -153,20 +157,28 @@ export default {
 
     // 完全关闭后
     afterClose() {
+      this.keyword = ''
       this.onReset()
       this.$emit('afterClose')
+    },
+
+    // 下拉框搜索
+    onSelectSearch(value) {
+      this.keyword = value
     },
 
     // 确定
     onOk() {
       this.form.validateFields((errors, values) => {
         if (errors) return
-        // console.log(values)
-        const args = {
-          ...values,
-          imageUrl: this.imageUrl
+        const fields = { ...values, imageUrl: this.imageUrl }
+        const target = this.memberList.find(
+          item => item.memberId === values.memberId
+        )
+        if (target) {
+          fields.nickname = target.nickname
         }
-        this.$emit('submit', args)
+        this.$emit('submit', fields)
       })
     },
 
@@ -178,21 +190,23 @@ export default {
 }
 </script>
 
+<style lang="less" scoped></style>
+
 <style lang="less">
-.system-advertisement-form-item {
+.member-share-form-item {
   .ant-form-item-children {
     display: flex;
   }
 }
 
-.system-advertisement-form-item-upload {
+.member-share-form-item-upload {
   margin-bottom: 4px;
   .ant-upload {
     margin: 0;
   }
 }
 
-.system-advertisement-upload-image {
+.member-share-upload-image {
   max-width: 86px;
 }
 

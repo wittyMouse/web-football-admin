@@ -18,13 +18,39 @@
                 placeholder="请输入作者名称"
               ></a-input>
             </a-form-item>
+            <a-form-item label="分类">
+              <a-select
+                :style="{ width: '174px' }"
+                v-decorator="['channelId', { initialValue: undefined }]"
+                placeholder="请选择分类"
+              >
+                <a-select-option
+                  v-for="item in channelList"
+                  :key="item.channelId"
+                  >{{ item.channelName }}</a-select-option
+                >
+              </a-select>
+            </a-form-item>
+            <a-form-item label="栏目">
+              <a-select
+                :style="{ width: '174px' }"
+                v-decorator="['columnId', { initialValue: undefined }]"
+                placeholder="请选择栏目"
+              >
+                <a-select-option
+                  v-for="item in columnList"
+                  :key="item.columnId"
+                  >{{ item.columnName }}</a-select-option
+                >
+              </a-select>
+            </a-form-item>
             <a-form-item label="文章标题">
               <a-input
                 v-decorator="['articleTitle', { initialValue: '' }]"
                 placeholder="请输入文章标题"
               ></a-input>
             </a-form-item>
-            <a-form-item label="置顶">
+            <!-- <a-form-item label="置顶">
               <a-select
                 :style="{ width: '174px' }"
                 v-decorator="['isTop', { initialValue: '' }]"
@@ -45,7 +71,7 @@
                 <a-select-option :value="1">是</a-select-option>
                 <a-select-option :value="0">否</a-select-option>
               </a-select>
-            </a-form-item>
+            </a-form-item> -->
           </a-col>
         </a-row>
         <a-row>
@@ -101,7 +127,7 @@
           <a @click="onEditClick(record)">编辑</a>
           <a-divider type="vertical" />
           <a @click="onDeleteClick(record)">删除</a>
-          <template
+          <!-- <template
             v-if="
               hasAuth(userPermissionMap, $route.name, 'top') ||
                 hasAuth(userPermissionMap, $route.name, 'recommend')
@@ -127,7 +153,7 @@
                 </a-menu-item>
               </a-menu>
             </a-dropdown>
-          </template>
+          </template> -->
         </template>
       </a-table>
 
@@ -168,6 +194,7 @@ import * as api from '@/api'
 import mixin from '@/mixins'
 import dateRange from '@/mixins/dateRange'
 import columns from './columns'
+import { channelList } from './config'
 import CreateModal from './components/CreateModal'
 import UpdateModal from './components/UpdateModal'
 
@@ -196,6 +223,7 @@ export default {
       createModalVisible: false,
       updateModalVisible: false,
       articleDetail: {},
+      channelList,
       columnList: [],
       userList: []
     }
@@ -459,6 +487,7 @@ export default {
     // 编辑按钮
     onEditClick(record) {
       this.getUserList()
+      record.channelId = record.channelId + ''
       this.articleDetail = record
       this.updateModalVisible = true
     },

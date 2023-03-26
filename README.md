@@ -1,4 +1,4 @@
-# web-football-admin
+# web-goodshot-admin
 
 ## Project setup
 ```

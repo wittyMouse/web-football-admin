@@ -1,8 +1,8 @@
 .DS_Store
 node_modules
 /dist
-/football-admin
-/test-football-admin
+/goodshot-admin
+/test-goodshot-admin
 
 # local env files
 .env.local

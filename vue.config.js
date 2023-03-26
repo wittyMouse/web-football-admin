@@ -1,10 +1,12 @@
 module.exports = {
   publicPath:
-    process.env.NODE_ENV !== 'production' ? '/test-admin/' : '/admin/',
+    process.env.NODE_ENV !== 'production'
+      ? '/test-goodshot-admin/'
+      : '/goodshot-admin/',
   outputDir:
     process.env.NODE_ENV !== 'production'
-      ? 'test-football-admin'
-      : 'football-admin',
+      ? 'test-goodshot-admin'
+      : 'goodshot-admin',
   lintOnSave: process.env.NODE_ENV !== 'production',
   devServer: {
     https: process.env.VUE_APP_PROTOCOL === 'https',
@@ -29,7 +31,7 @@ module.exports = {
   },
   chainWebpack: config => {
     config.plugin('html').tap(args => {
-      args[0].title = '巅峰后台'
+      args[0].title = '好球后台'
       return args
     })
     if (process.env.NODE_ENV === 'production') {

@@ -9,22 +9,15 @@
       >
         <a-row>
           <a-col>
-            <a-form-item label="栏目名称">
-              <a-input
-                v-decorator="['columnName', { initialValue: '' }]"
-                placeholder="请输入栏目名称"
-              ></a-input>
-            </a-form-item>
-            <a-form-item label="栏目状态">
+            <a-form-item label="类型">
               <a-select
                 :style="{ width: '174px' }"
-                v-decorator="['columnStatus', { initialValue: '' }]"
-                placeholder="请选择"
+                v-decorator="['type', { initialValue: undefined }]"
+                placeholder="请选择类型"
               >
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option :value="0">隐藏</a-select-option>
-                <a-select-option :value="1">正常</a-select-option>
-                <a-select-option :value="2">关闭</a-select-option>
+                <a-select-option v-for="item in typeList" :key="item.typeId">
+                  {{ item.typeName }}
+                </a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -42,10 +35,10 @@
       </a-form>
     </SearchBar>
 
-    <TableBlock title="栏目列表">
-      <!-- <template #option>
+    <TableBlock title="会员发布列表">
+      <template #option>
         <a-button type="primary" icon="plus" @click="onAddClick">添加</a-button>
-      </template> -->
+      </template>
 
       <a-table
         rowKey="id"
@@ -55,6 +48,12 @@
         :loading="loading"
         size="middle"
       >
+        <template slot="imageUrl" slot-scope="text">
+          <div class="member-share-list-image">
+            <img :src="text" alt="image" />
+          </div>
+        </template>
+
         <template slot="options" slot-scope="text, record">
           <a @click="onEditClick(record)">编辑</a>
           <a-divider type="vertical" />
@@ -75,10 +74,15 @@
       />
     </TableBlock>
 
-    <CreateModal :visible.sync="createModalVisible" @submit="onCreateSubmit" />
+    <CreateModal
+      :visible.sync="createModalVisible"
+      :memberList="memberList"
+      @submit="onCreateSubmit"
+    />
     <UpdateModal
       :visible.sync="updateModalVisible"
-      :columnDetail.sync="columnDetail"
+      :memberList="memberList"
+      :memberShareDetail.sync="memberShareDetail"
       @submit="onUpdateSubmit"
     />
   </div>
@@ -91,9 +95,10 @@ import dateRange from '@/mixins/dateRange'
 import columns from './columns'
 import CreateModal from './components/CreateModal'
 import UpdateModal from './components/UpdateModal'
+import { typeList } from './config'
 
 export default {
-  name: 'column-list',
+  name: 'member-share-list',
   components: {
     CreateModal,
     UpdateModal
@@ -104,12 +109,15 @@ export default {
       addLoading: false,
       updateLoading: false,
       deleteLoading: false,
+      memberListLoading: false,
       form: this.$form.createForm(this),
       columns,
       dataSource: [],
       createModalVisible: false,
       updateModalVisible: false,
-      columnDetail: {}
+      memberShareDetail: {},
+      typeList,
+      memberList: []
     }
   },
   mixins: [mixin, dateRange],
@@ -128,11 +136,11 @@ export default {
       this.updateList()
     },
 
-    // 获取栏目列表
-    getColumnList(params) {
+    // 获取会员发布列表
+    getMemberShareList(params) {
       this.loading = true
       api
-        .getColumnList(params)
+        .getMemberShareList(params)
         .then(res => {
           if (res.code === 0) {
             this.dataSource = res.result.records
@@ -147,11 +155,33 @@ export default {
         })
     },
 
-    // 添加栏目
-    addColumn(params, cb) {
+    // 查询用户列表
+    getMemberList() {
+      const params = {
+        query: {},
+        pageNo: 1,
+        pageSize: 9999
+      }
+      this.memberListLoading = true
+      api
+        .getMemberList(params)
+        .then(res => {
+          if (res.success) {
+            this.memberList = res.result.records
+          } else {
+            this.$_message.error(res.message)
+          }
+        })
+        .finally(() => {
+          this.memberListLoading = false
+        })
+    },
+
+    // 添加会员发布
+    addMemberShare(params, cb) {
       this.addLoading = true
       api
-        .addColumn(params)
+        .addMemberShare(params)
         .then(res => {
           if (res.code === 0) {
             this.$_message.success(res.message)
@@ -165,11 +195,11 @@ export default {
         })
     },
 
-    // 更新栏目
-    updateColumn(params, cb) {
+    // 更新会员发布
+    updateMemberShare(params, cb) {
       this.updateLoading = true
       api
-        .updateColumn(params)
+        .updateMemberShare(params)
         .then(res => {
           if (res.code === 0) {
             this.$_message.success(res.message)
@@ -183,11 +213,11 @@ export default {
         })
     },
 
-    // 删除栏目
-    deleteColumn(params, cb) {
+    // 删除会员发布
+    deleteMemberShare(params, cb) {
       this.deleteLoading = true
       api
-        .deleteColumn(params)
+        .deleteMemberShare(params)
         .then(res => {
           if (res.code === 0) {
             this.$_message.success(res.message)
@@ -223,19 +253,22 @@ export default {
 
     // 添加按钮
     onAddClick() {
+      this.getMemberList()
       this.createModalVisible = true
     },
 
     // 编辑按钮
     onEditClick(record) {
-      this.columnDetail = record
+      this.getMemberList()
+      record.type = record.type + ''
+      this.memberShareDetail = record
       this.updateModalVisible = true
     },
 
     // 提交添加表单
     onCreateSubmit(values) {
       console.log('create', values)
-      this.addColumn(values, () => {
+      this.addMemberShare(values, () => {
         this.updateList()
         this.createModalVisible = false
       })
@@ -244,7 +277,7 @@ export default {
     // 提交更新表单
     onUpdateSubmit(values) {
       console.log('update', values)
-      this.updateColumn(values, () => {
+      this.updateMemberShare(values, () => {
         this.updateList()
         this.updateModalVisible = false
       })
@@ -253,11 +286,12 @@ export default {
     // 删除按钮
     onDeleteClick(record) {
       console.log(record)
-      const { id, columnName } = record
+      const { id } = record
       this.$confirm({
-        title: `是否删除栏目【${columnName}】`,
+        // title: `是否删除会员发布【${columnName}】`,
+        title: `是否删除选中会员发布`,
         onOk: () => {
-          this.deleteColumn({ id }, () => {
+          this.deleteMemberShare({ id }, () => {
             this.updateList()
           })
         }
@@ -281,7 +315,7 @@ export default {
     // 更新列表数据
     updateList() {
       const params = this.formatParams()
-      this.getColumnList(params)
+      this.getMemberShareList(params)
     }
   },
   mounted() {
@@ -295,6 +329,19 @@ export default {
   .ant-pagination {
     float: right;
     margin: 16px 0;
+  }
+}
+
+.member-share-list-image {
+  margin: 0 auto;
+  width: 80px;
+  height: auto;
+  font-size: 0;
+  // object-fit: fill;
+
+  & img {
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

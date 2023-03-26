@@ -1,9 +1,9 @@
 {
-  "name": "web-football-admin",
+  "name": "web-goodshot-admin",
   "version": "1.0.3",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "test-build": "vue-cli-service build --mode test",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
@@ -13,7 +13,9 @@
     "axios": "^0.21.0",
     "core-js": "^3.6.5",
     "element-ui": "^2.14.1",
+    "immer": "^9.0.21",
     "lodash": "^4.17.20",
+    "moment": "^2.29.4",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"

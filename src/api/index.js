@@ -116,6 +116,15 @@ export const batchDeleteRecommend = params =>
 // 会员列表
 export const getMemberList = params =>
   postAction('/member/findListByPage', params)
+// 添加会员
+export const addMember = params => postAction('/member/add', params)
+// 更新会员
+export const updateMember = params => postAction('/member/update', params)
+// 删除会员
+export const deleteMember = params => postAction('/member/delete', params)
+// 批量删除会员
+export const batchDeleteMember = params =>
+  postAction('/member/deleteBatch', params)
 // 会员列表导出
 export const exportMemberList = params =>
   postAction('/member/findListByPageExportExcel', params, {
@@ -129,6 +138,9 @@ export const integralRecharge = params =>
 // 更新会员状态
 export const updateMemberStatus = params =>
   postAction('/member/updateStatus', params)
+// 修改会员密码
+export const updateMemberPassword = params =>
+  postAction('/member/updatePwd', params)
 // 会员重置密码
 export const resetPassword = params =>
   postAction('/member/resetPassword', params)
@@ -141,6 +153,23 @@ export const changeSubscribeStatus = params =>
 // 经验值修改
 export const changeExperience = params =>
   postAction('/member/changeExp', params)
+
+// 会员积分变更分页
+export const getIntegralChangeList = params =>
+  postAction('/member/integralChangeListByPage', params)
+
+// 获取会员发布列表
+export const getMemberShareList = params =>
+  postAction('/memberPublication/findListByPage', params)
+// 添加会员发布
+export const addMemberShare = params =>
+  postAction('/memberPublication/add', params)
+// 修改会员发布
+export const updateMemberShare = params =>
+  postAction('/memberPublication/update', params)
+// 删除会员发布
+export const deleteMemberShare = params =>
+  postAction('/memberPublication/delete', params)
 
 // 获取节目分类列表
 export const getRadioGroupList = params =>

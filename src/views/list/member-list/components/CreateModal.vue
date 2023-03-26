@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :visible="visible"
-    title="添加广告"
+    title="添加会员"
     :width="600"
     :afterClose="afterClose"
     @ok="onOk"
@@ -13,30 +13,11 @@
       :wrapper-col="{ span: 20 }"
       autocomplete="off"
     >
-      <a-form-item label="名称">
-        <a-input
-          v-decorator="['name', { initialValue: '', rules: rules.name }]"
-          placeholder="请输入名称"
-        ></a-input>
-      </a-form-item>
-      <a-form-item label="位置">
-        <a-select
-          v-decorator="[
-            'location',
-            { initialValue: undefined, rules: rules.location }
-          ]"
-          placeholder="请选择位置"
-        >
-          <a-select-option v-for="(item, index) in positionList" :key="index">{{
-            item
-          }}</a-select-option>
-        </a-select>
-      </a-form-item>
-      <a-form-item class="system-advertisement-form-item" label="图片">
+      <a-form-item class="member-form-item" label="头像">
         <a-upload
-          class="system-advertisement-form-item-upload"
+          class="member-form-item-upload"
           v-decorator="[
-            'imageUrl',
+            'avatar',
             {
               valuePropName: 'fileList',
               getValueFromEvent: handleUploadChange,
@@ -50,7 +31,7 @@
           :headers="uploadHeaders"
         >
           <img
-            class="system-advertisement-upload-image"
+            class="member-upload-image"
             :src="imageUrl"
             alt="avatar"
             v-if="imageUrl"
@@ -60,73 +41,55 @@
           </div>
         </a-upload>
       </a-form-item>
-      <a-form-item label="链接">
-        <a-textarea
-          v-decorator="['pageUrl', { initialValue: '' }]"
-          placeholder="请输入链接"
-        ></a-textarea>
-      </a-form-item>
-      <a-form-item label="权重">
+      <a-form-item label="账号">
         <a-input
-          v-decorator="['weight', { initialValue: '', rules: rules.weight }]"
-          placeholder="请输入权重"
-          addon-after="%"
+          v-decorator="['account', { initialValue: '', rules: rules.account }]"
+          placeholder="请输入账号"
         ></a-input>
       </a-form-item>
-      <a-form-item label="到期时间">
-        <a-date-picker
+      <a-form-item label="昵称">
+        <a-input
           v-decorator="[
-            'expiryDate',
-            { initialValue: '', rules: rules.expiryDate }
+            'nickname',
+            { initialValue: '', rules: rules.nickname }
           ]"
-          :show-time="showTime"
-          format="YYYY-MM-DD HH:mm"
-          valueFormat="YYYY-MM-DD HH:mm"
-          placeholder="请选择到期时间"
-        />
+          placeholder="请输入昵称"
+        ></a-input>
+      </a-form-item>
+      <a-form-item label="密码">
+        <a-input-password
+          v-decorator="['pwd', { initialValue: '', rules: rules.pwd }]"
+          placeholder="请输入密码"
+        ></a-input-password>
       </a-form-item>
     </a-form>
   </a-modal>
 </template>
 
 <script>
-import moment from 'moment'
-
 export default {
   name: 'CreateModal',
   props: {
     visible: {
       type: Boolean,
       default: false
-    },
-    positionList: {
-      type: Array,
-      default() {
-        return []
-      }
     }
   },
   data() {
     return {
       form: this.$form.createForm(this),
       rules: {
-        name: [{ required: true, message: '请输入名称' }],
-        location: [{ required: true, message: '请选择位置' }],
-        imageUrl: [{ required: true, message: '请上传图片' }],
-        pageUrl: [{ required: true, message: '请输入链接' }],
-        weight: [{ required: true, message: '请输入权重' }],
-        expiryDate: [{ required: true, message: '请选择到期时间' }]
+        imageUrl: [{ required: true, message: '请上传头像' }],
+        account: [{ required: true, message: '请输入账号' }],
+        nickname: [{ required: true, message: '请输入昵称' }],
+        pwd: [{ required: true, message: '请输入密码' }]
       },
       uploadHeaders: {
         'X-Access-Token': window.sessionStorage.getItem('token')
       },
       fileList: [],
       uploading: false,
-      imageUrl: '',
-      showTime: {
-        format: 'HH:mm',
-        defaultValue: moment('00:00', 'HH:mm')
-      }
+      imageUrl: ''
     }
   },
   methods: {
@@ -161,12 +124,7 @@ export default {
     onOk() {
       this.form.validateFields((errors, values) => {
         if (errors) return
-        // console.log(values)
-        const args = {
-          ...values,
-          imageUrl: this.imageUrl
-        }
-        this.$emit('submit', args)
+        this.$emit('submit', { ...values, imageUrl: this.imageUrl })
       })
     },
 
@@ -178,21 +136,23 @@ export default {
 }
 </script>
 
+<style lang="less" scoped></style>
+
 <style lang="less">
-.system-advertisement-form-item {
+.member-form-item {
   .ant-form-item-children {
     display: flex;
   }
 }
 
-.system-advertisement-form-item-upload {
+.member-form-item-upload {
   margin-bottom: 4px;
   .ant-upload {
     margin: 0;
   }
 }
 
-.system-advertisement-upload-image {
+.member-upload-image {
   max-width: 86px;
 }
 

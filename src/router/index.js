@@ -65,6 +65,12 @@ const routes = [
         name: 'ranking-list',
         component: () => import('../views/list/ranking-list'),
         meta: { title: '榜单数据列表', requiresAuth: true }
+      },
+      {
+        path: 'member-share-list',
+        name: 'member-share-list',
+        component: () => import('../views/list/member-share-list'),
+        meta: { title: '会员晒单列表', requiresAuth: true }
       }
     ]
   },

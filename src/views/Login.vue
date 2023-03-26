@@ -6,7 +6,7 @@
           class="login-title__logo"
           :src="require('../assets/images/logo.svg')"
         />
-        <span class="login-title__text">巅峰后台</span>
+        <span class="login-title__text">好球后台</span>
       </div>
       <div class="login-form">
         <a-form
@@ -29,7 +29,7 @@
             </a-input>
           </a-form-item>
           <a-form-item>
-            <a-input
+            <a-input-password
               size="large"
               v-decorator="['password', { rules: rules.password }]"
               type="password"
@@ -40,7 +40,7 @@
                 type="lock"
                 style="color: rgba(0, 0, 0, .25)"
               />
-            </a-input>
+            </a-input-password>
           </a-form-item>
           <a-row :gutter="0">
             <a-col :span="16">
