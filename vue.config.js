@@ -1,12 +1,12 @@
 module.exports = {
   publicPath:
     process.env.NODE_ENV !== 'production'
-      ? '/test-goodshot-admin/'
-      : '/goodshot-admin/',
+      ? `/test-${process.env.VUE_SECOND_HOST}/`
+      : `/${process.env.VUE_SECOND_HOST}/`,
   outputDir:
     process.env.NODE_ENV !== 'production'
-      ? 'test-goodshot-admin'
-      : 'goodshot-admin',
+      ? `test-${process.env.VUE_SECOND_HOST}`
+      : process.env.VUE_SECOND_HOST,
   lintOnSave: process.env.NODE_ENV !== 'production',
   devServer: {
     https: process.env.VUE_APP_PROTOCOL === 'https',

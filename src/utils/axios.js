@@ -76,7 +76,9 @@ http.interceptors.response.use(
         onOk: () => {
           clearData()
           location.href =
-            process.env.NODE_ENV === 'production' ? '/admin' : '/test-admin'
+            process.env.NODE_ENV === 'production'
+              ? `/${process.env.VUE_SECOND_HOST}`
+              : `/test-${process.env.VUE_SECOND_HOST}`
         }
       })
     }
