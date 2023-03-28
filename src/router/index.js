@@ -110,6 +110,12 @@ const routes = [
         name: 'recharge-record',
         component: () => import('../views/record/recharge-record'),
         meta: { title: '充值记录', requiresAuth: true }
+      },
+      {
+        path: 'integral-change-record',
+        name: 'integral-change-record',
+        component: () => import('../views/record/integral-change-record'),
+        meta: { title: '会员积分变更记录', requiresAuth: true }
       }
     ]
   },
