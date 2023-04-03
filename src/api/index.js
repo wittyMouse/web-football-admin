@@ -356,6 +356,19 @@ export const updateLevelConfig = params =>
 export const deleteLevelConfig = params =>
   postAction('/vipLevelConfig/delete', params)
 
+// 获取公告
+export const getNoticeList = params =>
+  postAction('/notice/findListByPage', params)
+
+// 添加公告
+export const addNotice = params => postAction('/notice/add', params)
+
+// 更新公告
+export const updateNotice = params => postAction('/notice/update', params)
+
+// 删除公告
+export const deleteNotice = params => postAction('/notice/delete', params)
+
 export default {
   getCheckCode,
   login,
@@ -506,5 +519,11 @@ export default {
   getLevelConfig,
   addLevelConfig,
   updateLevelConfig,
-  deleteLevelConfig
+  deleteLevelConfig,
+
+  // 公告配置
+  getNoticeList,
+  addNotice,
+  updateNotice,
+  deleteNotice
 }

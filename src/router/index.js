@@ -206,6 +206,12 @@ const routes = [
         name: 'system-level',
         component: () => import('../views/system/system-level'),
         meta: { title: '等级配置', requiresAuth: true }
+      },
+      {
+        path: 'system-notice',
+        name: 'system-notice',
+        component: () => import('../views/system/system-notice'),
+        meta: { title: '公告配置', requiresAuth: true }
       }
     ]
   },
