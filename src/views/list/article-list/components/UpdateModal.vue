@@ -117,6 +117,7 @@
           :showTime="showTime"
           format="YYYY-MM-DD HH:mm"
           valueFormat="YYYY-MM-DD HH:mm"
+          placeholder="请选择发布时间"
         ></a-date-picker>
       </a-form-item>
       <a-form-item label="公开时间">
@@ -128,6 +129,7 @@
           :showTime="showTime"
           format="YYYY-MM-DD HH:mm"
           valueFormat="YYYY-MM-DD HH:mm"
+          placeholder="请选择公开时间"
         ></a-date-picker>
       </a-form-item>
       <a-form-item label="文章内容">

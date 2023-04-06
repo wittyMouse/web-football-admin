@@ -24,7 +24,10 @@
           :style="{ width: '100%' }"
           v-decorator="['expiryDate', { initialValue: '' }]"
           :show-time="showTime"
+          :disabled-date="disabledBeforeDate"
+          format="YYYY-MM-DD HH:mm"
           valueFormat="YYYY-MM-DD HH:mm"
+          placeholder="请选择过期时间"
         ></a-date-picker>
       </a-form-item>
     </a-form>
@@ -32,6 +35,8 @@
 </template>
 
 <script>
+import moment from 'moment'
+
 const formFields = ['content', 'expiryDate']
 
 export default {
@@ -76,6 +81,11 @@ export default {
     }
   },
   methods: {
+    // 禁用之前的日期
+    disabledBeforeDate(current) {
+      return current && current < moment().startOf('day')
+    },
+
     onReset() {
       this.form.resetFields()
       this.$emit('update:noticeDetail', {})

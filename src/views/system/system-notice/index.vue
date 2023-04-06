@@ -15,31 +15,29 @@
                 placeholder="请输入公告内容"
               ></a-input>
             </a-form-item>
-            <a-form-item label="创建时间">
-              <a-date-picker
-                v-decorator="['createTime', { initialValue: '' }]"
-                :show-time="showTime"
-                :disabled-date="disabledAfterDate"
-                valueFormat="YYYY-MM-DD HH:mm:ss"
-              ></a-date-picker>
-            </a-form-item>
             <a-form-item label="过期时间">
-              <a-date-picker
+              <!-- <a-date-picker
                 v-decorator="['expiryDate', { initialValue: '' }]"
                 :show-time="showTime"
                 valueFormat="YYYY-MM-DD HH:mm:ss"
-              ></a-date-picker>
+                placeholder="请选择过期时间"
+              ></a-date-picker> -->
+              <a-range-picker
+                v-decorator="['rangeDate', { initialValue: [] }]"
+                :show-time="showTime"
+                valueFormat="YYYY-MM-DD HH:mm:ss"
+              ></a-range-picker>
             </a-form-item>
           </a-col>
         </a-row>
         <a-row>
           <a-col :span="24" class="text-right">
-            <a-button type="primary" icon="search" @click="onSearchClick"
-              >搜索</a-button
-            >
-            <a-button type="primary" icon="reload" @click="onResetClick"
-              >重置</a-button
-            >
+            <a-button type="primary" icon="search" @click="onSearchClick">
+              搜索
+            </a-button>
+            <a-button type="primary" icon="reload" @click="onResetClick">
+              重置
+            </a-button>
           </a-col>
         </a-row>
       </a-form>
@@ -239,7 +237,11 @@ export default {
     // 提交添加表单
     onCreateSubmit(values) {
       console.log('create', values)
-      this.addNotice(values, () => {
+      const params = {
+        ...values,
+        expiryDate: values.expiryDate + ':00'
+      }
+      this.addNotice(params, () => {
         this.updateList()
         this.createModalVisible = false
       })
@@ -248,7 +250,11 @@ export default {
     // 提交更新表单
     onUpdateSubmit(values) {
       console.log('update', values)
-      this.updateNotice(values, () => {
+      const params = {
+        ...values,
+        expiryDate: values.expiryDate + ':00'
+      }
+      this.updateNotice(params, () => {
         this.updateList()
         this.updateModalVisible = false
       })
@@ -257,9 +263,9 @@ export default {
     // 删除按钮
     onDeleteClick(record) {
       console.log(record)
-      const { id, channelName } = record
+      const { id, content } = record
       this.$confirm({
-        title: `是否删除公告【${channelName}】`,
+        title: `是否删除公告【${content}】`,
         onOk: () => {
           this.deleteNotice({ id }, () => {
             this.onSearchClick()
@@ -269,13 +275,29 @@ export default {
     },
 
     // 格式化请求参数
+    // formatParams() {
+    //   const { content, expiryDate } = this.form.getFieldsValue()
+
+    //   const params = {
+    //     content,
+    //     expiryDate,
+    //     pageNo: this.pagination.current,
+    //     pageSize: this.pagination.pageSize
+    //   }
+
+    //   return params
+    // },
+
+    // 格式化请求参数
     formatParams() {
-      const { content, createTime, expiryDate } = this.form.getFieldsValue()
+      const { content, rangeDate } = this.form.getFieldsValue()
+
+      const [expiryDateBegin = '', expiryDateEnd = ''] = rangeDate || []
 
       const params = {
         content,
-        createTime,
-        expiryDate,
+        expiryDateBegin,
+        expiryDateEnd,
         pageNo: this.pagination.current,
         pageSize: this.pagination.pageSize
       }

@@ -64,6 +64,7 @@
               :showTime="showTime"
               format="YYYY-MM-DD HH:mm"
               valueFormat="YYYY-MM-DD HH:mm"
+              placeholder="请选择发布时间"
             ></a-date-picker>
           </a-form-item>
         </a-col>

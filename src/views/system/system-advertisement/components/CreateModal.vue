@@ -19,17 +19,21 @@
           placeholder="请输入名称"
         ></a-input>
       </a-form-item>
-      <a-form-item label="位置">
+      <a-form-item label="分类">
         <a-select
           v-decorator="[
-            'location',
-            { initialValue: undefined, rules: rules.location }
+            'channelId',
+            { initialValue: undefined, rules: rules.channelId }
           ]"
-          placeholder="请选择位置"
+          placeholder="请选择分类"
         >
-          <a-select-option v-for="(item, index) in positionList" :key="index">{{
-            item
-          }}</a-select-option>
+          <a-select-option
+            :value="item.channelId"
+            v-for="(item, index) in channelList"
+            :key="index"
+          >
+            {{ item.channelName }}
+          </a-select-option>
         </a-select>
       </a-form-item>
       <a-form-item class="system-advertisement-form-item" label="图片">
@@ -99,7 +103,7 @@ export default {
       type: Boolean,
       default: false
     },
-    positionList: {
+    channelList: {
       type: Array,
       default() {
         return []
@@ -111,7 +115,7 @@ export default {
       form: this.$form.createForm(this),
       rules: {
         name: [{ required: true, message: '请输入名称' }],
-        location: [{ required: true, message: '请选择位置' }],
+        channelId: [{ required: true, message: '请选择分类' }],
         imageUrl: [{ required: true, message: '请上传图片' }],
         pageUrl: [{ required: true, message: '请输入链接' }],
         weight: [{ required: true, message: '请输入权重' }],

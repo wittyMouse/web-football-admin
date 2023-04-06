@@ -73,6 +73,7 @@
           :showTime="showTime"
           format="YYYY-MM-DD HH:mm"
           valueFormat="YYYY-MM-DD HH:mm"
+          placeholder="请选择比赛时间"
         ></a-date-picker>
       </a-form-item> -->
       <!-- <div class="update-result-modal-layout">

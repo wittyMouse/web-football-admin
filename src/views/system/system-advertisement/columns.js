@@ -1,17 +1,4 @@
-const positionList = [
-  '首页轮换',
-  '首页底部',
-  '王牌推介顶部',
-  '王牌推介底部',
-  '贴士专区顶部',
-  '贴士专区底部',
-  '节目回放顶部',
-  '节目回放底部',
-  '重大利好顶部',
-  '重大利好底部',
-  '本周放榜顶部',
-  '本周放榜底部'
-]
+import { channelMap } from './config'
 
 export default [
   {
@@ -22,10 +9,10 @@ export default [
     customRender: (text, record, index) => index + 1
   },
   {
-    title: '位置',
-    dataIndex: 'location',
+    title: '分类',
+    dataIndex: 'channelId',
     align: 'center',
-    customRender: text => positionList[text]
+    customRender: text => channelMap[text]
   },
   {
     title: '图片',
